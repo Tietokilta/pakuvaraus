@@ -2,29 +2,18 @@ use axum::{
     extract::{Json, State},
 };
 use crate::state::AppState;
-use crate::reservations::{Reservation, CreateReservation};
+use crate::reservations::{Reservation, CreateReservation, ReservationValidation};
+use crate::logic::{add_reservation, get_reservations};
 
-pub async fn create_reservation(
+pub async fn handle_reservation(
     State(state): State<AppState>,
     Json(payload): Json<CreateReservation>,
-) -> Json<Reservation> {
-    let new_reservation = sqlx::query_as!(
-        Reservation,
-        "INSERT INTO reservations (reservation_name) VALUES ($1) RETURNING id, reservation_name",
-        payload.reservation_name
-    )
-    .fetch_one(&state.db_pool)
-    .await
-    .expect("Failed to create reservation");
-
-    Json(new_reservation)
+) -> Json<ReservationValidation> {
+    let valid= add_reservation(&state.db_pool, &payload).await;
+    Json(valid)
 }
 
-pub async fn get_reservations(State(state): State<AppState>) -> Json<Vec<Reservation>> {
-    let reservations = sqlx::query_as!(Reservation, "SELECT id, reservation_name FROM reservations")
-        .fetch_all(&state.db_pool)
-        .await
-        .expect("Failed to fetch reservations");
-
+pub async fn handle_get_reservations(State(state): State<AppState>) -> Json<Vec<Reservation>> {
+    let reservations = get_reservations(&state.db_pool).await;
     Json(reservations)
 }

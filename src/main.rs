@@ -5,9 +5,10 @@ use axum::{
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 
-use handlers::{create_reservation, get_reservations};
+use handlers::{handle_reservation, handle_get_reservations};
 
 mod handlers;
+mod logic;
 mod reservations;
 mod state;
 
@@ -16,8 +17,8 @@ async fn main() {
     let app_state = state::new().await;
 
     let app = Router::new()
-        .route("/reservations", post(create_reservation))
-        .route("/reservations", get(get_reservations))
+        .route("/reservations", post(handle_reservation))
+        .route("/reservations", get(handle_get_reservations))
         .with_state(app_state);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
