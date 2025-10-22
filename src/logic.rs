@@ -10,6 +10,7 @@ async fn validate_reservation(
         return ReservationValidation {is_valid: false, reason: String::from("Start time must be before end time")}; 
     }
 
+    // This needs to be moved to the db itself or otherwise changed to prevent simultaneous multiple reservation
     let overlapping: Vec<Reservation> = sqlx::query_as!(
         Reservation, 
             "SELECT id, reservation_name, start_time, end_time FROM reservations res WHERE res.start_time <= $2 AND res.end_time >= $1",
