@@ -3,26 +3,10 @@ use sqlx::postgres::PgPool;
 use crate::reservations::{Reservation, CreateReservation, ReservationValidation};
 
 async fn validate_reservation(
-    db_pool: &PgPool,
     reservation: &CreateReservation
 ) -> ReservationValidation {
     if reservation.end_time < reservation.start_time { 
         return ReservationValidation {is_valid: false, reason: String::from("Start time must be before end time")}; 
-    }
-
-    // This needs to be moved to the db itself or otherwise changed to prevent simultaneous multiple reservation
-    let overlapping: Vec<Reservation> = sqlx::query_as!(
-        Reservation, 
-            "SELECT id, reservation_name, start_time, end_time FROM reservations res WHERE res.start_time <= $2 AND res.end_time >= $1",
-            reservation.start_time,
-            reservation.end_time
-        )
-        .fetch_all(db_pool)
-        .await
-        .expect("Failed to fetch reservations");
-
-    if overlapping.len() != 0 {
-        return ReservationValidation {is_valid: false, reason: String::from("There is an overlapping reservation")};
     }
 
     ReservationValidation {is_valid: true, reason: String::from("Valid")}
@@ -32,10 +16,10 @@ pub async fn add_reservation(
     db_pool: &PgPool,
     reservation: &CreateReservation
 ) -> ReservationValidation {
-    let valid= validate_reservation(db_pool, reservation).await;
+    let valid= validate_reservation(reservation).await;
 
     if valid.is_valid {
-        sqlx::query_as!(
+        let res = sqlx::query_as!(
             Reservation,
             "INSERT INTO reservations (reservation_name, start_time, end_time) VALUES ($1, $2, $3) RETURNING id, reservation_name, start_time, end_time",
             reservation.reservation_name,
@@ -43,8 +27,24 @@ pub async fn add_reservation(
             reservation.end_time
         )
         .fetch_one(db_pool)
-        .await
-        .expect("Failed to create reservation");
+        .await;
+
+        match res {
+            Ok(_) => (),
+            Err(err) => {
+                match err.as_database_error() {
+                    Some(db_err) => {
+                        match db_err.constraint()  {
+                            Some(_) => {
+                                return ReservationValidation {is_valid: false, reason: String::from("There is an overlapping reservation")};  
+                            }
+                            None => ()
+                        }
+                    },
+                    None => ()
+                }
+            }
+        }
     }
 
     valid
