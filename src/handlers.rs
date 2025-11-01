@@ -1,9 +1,18 @@
 use axum::{
     extract::{Json, State},
+    routing::{get, post},
+    Router,
 };
 use crate::state::AppState;
 use crate::reservations::{Reservation, CreateReservation, ReservationValidation};
 use crate::logic::{add_reservation, get_reservations};
+
+pub fn router(state: AppState) -> Router<()> {
+    Router::new()
+        .route("/reservations", post(handle_reservation))
+        .route("/reservations", get(handle_get_reservations))
+        .with_state(state)
+}
 
 pub async fn handle_reservation(
     State(state): State<AppState>,

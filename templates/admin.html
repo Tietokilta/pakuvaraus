@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>Admin page</title>
+  </head>
+
+  <body>
+    <ul>
+      {% for reservation in reservations %}
+      <li>
+        <span><strong>{{ reservation }}</strong></span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <p>User: {{username}}</p>
+
+    <a href="/logout">Logout</a>
+  </body>
+</html>

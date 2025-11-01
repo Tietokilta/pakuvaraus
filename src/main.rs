@@ -4,22 +4,41 @@ use axum::{
 };
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use tower_sessions::{Expiry, SessionManagerLayer, MemoryStore};
+use tower_sessions::cookie::SameSite;
+use axum_login::{AuthManagerLayerBuilder, login_required};
+use axum_messages::{MessagesManagerLayer};
+use tracing_subscriber;
 
-use handlers::{handle_reservation, handle_get_reservations};
+//use handlers::{handle_reservation, handle_get_reservations};
 
+mod admin;
 mod handlers;
 mod logic;
+mod login;
 mod reservations;
 mod state;
+mod users;
 
 #[tokio::main]
 async fn main() {
-    let app_state = state::new().await;
+    tracing_subscriber::fmt::init();
 
-    let app = Router::new()
-        .route("/reservations", post(handle_reservation))
-        .route("/reservations", get(handle_get_reservations))
-        .with_state(app_state);
+    let session_store = MemoryStore::default();
+    let session_layer = SessionManagerLayer::new(session_store)
+        .with_secure(false)
+        .with_same_site(SameSite::Lax)
+        .with_expiry(Expiry::OnSessionEnd);    
+    
+    let app_state = state::new().await;
+    let auth_layer = AuthManagerLayerBuilder::new(app_state.clone(), session_layer).build();
+
+    let app = admin::router()
+        .route_layer(login_required!(state::AppState, login_url = "/login"))
+        .merge(login::router())
+        .merge(handlers::router(app_state))
+        .layer(MessagesManagerLayer)
+        .layer(auth_layer);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 

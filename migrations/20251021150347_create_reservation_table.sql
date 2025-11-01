@@ -8,3 +8,12 @@ CREATE TABLE reservations (
         tstzrange(start_time, end_time) WITH &&
     )
 );
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+);
+
+insert into users (id, username, password)
+values (1, 'test-user', 'password');
