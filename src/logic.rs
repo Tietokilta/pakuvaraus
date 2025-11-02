@@ -1,6 +1,9 @@
 use sqlx::postgres::PgPool;
+use axum_login::AuthSession;
 
+use crate::state::AppState;
 use crate::reservations::{Reservation, CreateReservation, ReservationValidation};
+use crate::users::UserDataObject;
 
 async fn validate_reservation(
     reservation: &CreateReservation
@@ -57,4 +60,18 @@ pub async fn get_reservations(db_pool: &PgPool) -> Vec<Reservation> {
         .expect("Failed to fetch reservations");
 
     reservations
+}
+
+pub async fn get_admins(auth_session: &AuthSession<AppState>) -> Vec<UserDataObject> {
+    match &auth_session.user {
+        Some(_) => {                
+            let admins = sqlx::query_as!(UserDataObject, "SELECT id, username FROM users")
+                .fetch_all(&auth_session.backend.db_pool)
+                .await
+                .expect("Failed to fetch admins");
+                
+            admins
+        },
+        None => vec!()
+    }
 }

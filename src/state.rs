@@ -2,18 +2,10 @@ use sqlx::postgres::PgPool;
 use std::env;
 use dotenv::dotenv;
 use axum_login::{AuthnBackend, UserId};
-use password_auth::verify_password;
 use tokio::task;
-use serde::{Deserialize};
 use tracing::info;
 
-use crate::users::{User};
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct Credentials {
-    pub username: String,
-    pub password: String,
-}
+use crate::users::{Credentials, User};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -80,5 +72,3 @@ impl AuthnBackend for AppState {
         Ok(user)
     }
 }
-
-pub type AuthSession = axum_login::AuthSession<AppState>;

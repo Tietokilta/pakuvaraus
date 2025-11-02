@@ -1,7 +1,3 @@
-use axum::{
-    routing::{get, post},
-    Router,
-};
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tower_sessions::{Expiry, SessionManagerLayer, MemoryStore};
@@ -9,8 +5,6 @@ use tower_sessions::cookie::SameSite;
 use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::{MessagesManagerLayer};
 use tracing_subscriber;
-
-//use handlers::{handle_reservation, handle_get_reservations};
 
 mod admin;
 mod handlers;

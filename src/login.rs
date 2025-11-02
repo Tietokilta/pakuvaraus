@@ -6,10 +6,11 @@ use axum::{
     http::StatusCode,
 };
 use axum_login::AuthSession;
-use axum_messages::{Message, Messages};
+use axum_messages::Messages;
 use tracing::info;
 
-use crate::state::{Credentials, AppState};
+use crate::state::AppState;
+use crate::users::Credentials;
 
 pub fn router() -> Router<()> {
     Router::new()

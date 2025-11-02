@@ -7,12 +7,13 @@ use axum::{
 use axum_login::AuthSession;
 
 use crate::state::AppState;
-use crate::logic::get_reservations;
+use crate::logic::{get_reservations, get_admins};
 
 #[derive(Template)]
 #[template(path = "admin.html")]
 struct AdminTemplate<'a> {
     reservations: Vec<String>,
+    admins: Vec<String>,
     username: &'a str,
 }
 
@@ -21,20 +22,18 @@ pub fn router() -> Router<()> {
 }
 
 mod get {
-    use crate::reservations;
-
     use super::*;
 
     pub async fn protected(auth_session: AuthSession<AppState>) -> impl IntoResponse {
-        match auth_session.user {
-            Some(user) => {
-                //Html(format!("<h1>Admin page, user: {}</h1>", user.username)).into_response()
-                
+        match &auth_session.user {
+            Some(user) => {                
                 let res = get_reservations(&auth_session.backend.db_pool).await;
+                let admins = get_admins(&auth_session).await;
 
                 Html(
                     AdminTemplate {
                         reservations: res.iter().map(|r| r.reservation_name.clone()).collect(),
+                        admins: admins.iter().map(|a| a.username.clone()).collect(),
                         username: &user.username,
                     }
                     .render()

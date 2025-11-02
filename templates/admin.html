@@ -4,6 +4,7 @@
   </head>
 
   <body>
+    <b>Reservations</b>
     <ul>
       {% for reservation in reservations %}
       <li>
@@ -12,7 +13,16 @@
       {% endfor %}
     </ul>
 
-    <p>User: {{username}}</p>
+    <b>Administrators</b>
+    <ul>
+      {% for admin in admins %}
+      <li>
+        <span><strong>{{ admin }}</strong></span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <p>Logged in as admin: {{username}}</p>
 
     <a href="/logout">Logout</a>
   </body>
