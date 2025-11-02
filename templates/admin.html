@@ -4,26 +4,33 @@
   </head>
 
   <body>
-    <b>Reservations</b>
-    <ul>
-      {% for reservation in reservations %}
-      <li>
-        <span><strong>{{ reservation }}</strong></span>
-      </li>
-      {% endfor %}
-    </ul>
+    <div>
+      <p>Logged in as admin: {{username}}</p>
+      <a href="/logout">Logout</a>
+    </div>
 
-    <b>Administrators</b>
-    <ul>
-      {% for admin in admins %}
-      <li>
-        <span><strong>{{ admin }}</strong></span>
-      </li>
-      {% endfor %}
-    </ul>
+    <div>
+      <b>Administrators</b>
+      <ul>
+        {% for admin in admins %}
+        <li>
+          <span><strong>{{ admin }}</strong></span>
+        </li>
+        {% endfor %}
+      </ul>
 
-    <p>Logged in as admin: {{username}}</p>
+      <a href="/admin/new">Create a new admininstrator</a>
+    </div>
 
-    <a href="/logout">Logout</a>
+    <div>
+      <b>Reservations</b>
+      <ul>
+        {% for reservation in reservations %}
+        <li>
+          <span><strong>{{ reservation }}</strong></span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
   </body>
 </html>
