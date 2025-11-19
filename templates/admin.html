@@ -1,11 +1,12 @@
 <html>
   <head>
-    <title>Admin page</title>
+    <title>Administrator's page</title>
   </head>
 
   <body>
     <div>
       <p>Logged in as admin: {{username}}</p>
+      <a href="/admin/password">Change password</a>
       <a href="/logout">Logout</a>
     </div>
 
@@ -14,12 +15,12 @@
       <ul>
         {% for admin in admins %}
         <li>
-          <span><strong>{{ admin }}</strong></span>
+          <span><strong>{{ admin }}</strong></span> <a href="/admin/{{ admin }}">delete</a>
         </li>
         {% endfor %}
       </ul>
 
-      <a href="/admin/new">Create a new admininstrator</a>
+      <a href="/admin/new">Create a new administrator</a>
     </div>
 
     <div>

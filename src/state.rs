@@ -5,7 +5,7 @@ use axum_login::{AuthnBackend, UserId};
 use tokio::task;
 use tracing::info;
 
-use crate::users::{Credentials, User};
+use crate::users::{Credentials, User, check_user_credentials};
 
 #[derive(Clone)]
 pub struct AppState {
@@ -43,23 +43,14 @@ impl AuthnBackend for AppState {
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
         let user: Option<Self::User> = sqlx::query_as("select * from users where username = $1")
-            .bind(creds.username)
+            .bind(&creds.username)
             .fetch_optional(&self.db_pool)
             .await?;
-        /*
-        // Verifying the password is blocking and potentially slow, so we'll do so via
-        // `spawn_blocking`.
-        task::spawn_blocking(|| {
-            // We're using password-based authentication--this works by comparing our form
-            // input with an argon2 password hash.
-            Ok(user.filter(|user| verify_password(creds.password, &user.password).is_ok()))
+        
+        task::spawn_blocking(move || {
+            Ok(user.filter(|user| check_user_credentials(user, &creds)))
         })
         .await?
-        */
-
-        info!("Authenticate");
-
-        Ok(user)
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {

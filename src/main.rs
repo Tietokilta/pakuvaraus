@@ -4,6 +4,7 @@ use tower_sessions::{Expiry, SessionManagerLayer, MemoryStore};
 use tower_sessions::cookie::SameSite;
 use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::{MessagesManagerLayer};
+use tracing::info;
 use tracing_subscriber;
 
 mod admin;
@@ -17,6 +18,9 @@ mod users;
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
+
+    let test_password = "pass123";
+    info!("Test password: {}, hash: {}", test_password, users::password_hash(&test_password.to_string()));
 
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)

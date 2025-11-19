@@ -16,4 +16,4 @@ CREATE TABLE users (
 );
 
 insert into users (id, username, password)
-values (1, 'test-user', 'password');
+values (1, 'test-user', '$argon2id$v=19$m=19456,t=2,p=1$SfdB+aDttM1CImYRHZz77A$GrbTi6iHIqIbV0rIg/Fy62mhdMvT/K75dfuVhafv/HE');
