@@ -109,7 +109,7 @@ pub async fn set_user_password(
             if data.password == data.password_again {
                 let res = sqlx::query!(
                     "UPDATE users SET password = $1 WHERE id = $2",
-                    data.password,
+                    password_hash(&data.password),
                     user.id,
                 )
                 .fetch_one(&auth_session.backend.db_pool)
