@@ -11,3 +11,15 @@ run postgres, for example with docker
 set up the database
     sqlx database create
     sqlx migrate run
+
+add and get reservations in powershell:
+
+$body = @{
+    reservation_name = "Test name 1"
+    start_time = "2025-10-20T10:00:00.000000Z"
+    end_time = "2025-10-20T12:00:00.000000Z"
+}
+
+Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Post -ContentType "application/json" -Body ($body | ConvertTo-Json)
+
+Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Get
