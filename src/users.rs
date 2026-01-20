@@ -106,9 +106,12 @@ pub fn password_hash(password: &String) -> String {
     return generate_hash(password)
 }
 
+pub fn check_user_password(user: &User, password: &String) -> bool {
+    return verify_password(password, &user.password).is_ok();
+}
+
 pub fn check_user_credentials(user: &User, creds: &Credentials) -> bool {
-    return verify_password(&creds.password, &user.password).is_ok();
-    //return true;
+    return check_user_password(user, &creds.password);
 }
 
 pub async fn add_user(
@@ -138,13 +141,13 @@ pub async fn add_user(
 }
 
 pub async fn set_user_password(
-    auth_session: &AuthSession<AppState>,
+    auth_session: &AuthenticatedSession,
     data: &SetUserPasswordData
 ) {
     info!("Try to set user password");
     match &auth_session.user {
         Some(user) => {
-            if data.password == data.password_again {
+            if check_user_password(user, &data.old_password) && data.password == data.password_again {
                 let res = sqlx::query!(
                     "UPDATE users SET password = $1 WHERE id = $2",
                     password_hash(&data.password),
@@ -170,7 +173,7 @@ pub async fn set_user_password(
 }
 
 pub async fn remove_user(
-    auth_session: &AuthSession<AppState>,
+    auth_session: &AuthenticatedSession,
     username: &String,
 ) {
     info!("Try to remove user");

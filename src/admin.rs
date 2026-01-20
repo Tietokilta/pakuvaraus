@@ -5,7 +5,6 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use axum_login::AuthSession;
 
 use crate::state::AppState;
 use crate::logic::{get_reservations, get_admins};
@@ -44,7 +43,7 @@ pub fn router() -> Router<AppState> {
 mod get {
     use super::*;
 
-    pub async fn admin_page(auth_session: AuthSession<AppState>) -> impl IntoResponse {
+    pub async fn admin_page(auth_session: AuthenticatedSession) -> impl IntoResponse {
         match &auth_session.user {
             Some(user) => {                
                 let res = get_reservations(&auth_session.backend.db_pool).await;
@@ -65,41 +64,31 @@ mod get {
         }
     }
 
-    pub async fn new_admin(_session: AuthenticatedSession) -> impl IntoResponse {
-        return Html(
+    pub async fn new_admin(_auth_session: AuthenticatedSession) -> impl IntoResponse {
+        Html(
             NewAdminTemplate {
 
             }
             .render()
             .unwrap(),
             )
-        .into_response();
+        .into_response()
     }
 
-    pub async fn change_password(auth_session: AuthSession<AppState>) -> impl IntoResponse {
-        match &auth_session.user {
-            Some(_) => {
-                Html(
-                    ChangePasswordTemplate {
+    pub async fn change_password(_auth_session: AuthenticatedSession) -> impl IntoResponse {
+        Html(
+            ChangePasswordTemplate {
 
-                    }
-                    .render()
-                    .unwrap(),
-                    )
-                .into_response()
-            },
-            None => Redirect::to("/login").into_response(),
-        }
+            }
+            .render()
+            .unwrap(),
+            )
+        .into_response()
     }
     
-    pub async fn remove_admin(auth_session: AuthSession<AppState>, Path(username): Path<String>) -> impl IntoResponse {
-        match &auth_session.user {
-            Some(_) => {
-                remove_user(&auth_session, &username).await;
-                Redirect::to("/admin").into_response()
-            },
-            None => Redirect::to("/login").into_response(),
-        }
+    pub async fn remove_admin(auth_session: AuthenticatedSession, Path(username): Path<String>) -> impl IntoResponse {
+        remove_user(&auth_session, &username).await;
+        Redirect::to("/admin").into_response()
     }
 }
 
@@ -111,13 +100,8 @@ mod post {
         Redirect::to("/admin").into_response()
     }
 
-    pub async fn change_password(auth_session: AuthSession<AppState>, Form(payload): Form<SetUserPasswordData>) -> impl IntoResponse {
-        match &auth_session.user {
-            Some(_) => {
-                set_user_password(&auth_session, &payload).await;
-                Redirect::to("/admin").into_response()
-            },
-            None => Redirect::to("/login").into_response(),
-        }
+    pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): Form<SetUserPasswordData>) -> impl IntoResponse {
+        set_user_password(&auth_session, &payload).await;
+        Redirect::to("/admin").into_response()
     }
 }
