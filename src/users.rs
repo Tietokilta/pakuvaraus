@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use axum::{extract::{FromRequestParts, FromRef}, http::{request::Parts}, response::{IntoResponse, Redirect, Response}};
 use axum_login::{AuthUser, AuthSession};
 use password_auth::{verify_password, generate_hash};
 use tracing::info;
@@ -22,6 +23,8 @@ pub struct UserDataObject {
     pub id: i32,
     pub username: String,
 }
+
+pub struct AuthenticatedUser(User);
 
 #[derive(Deserialize)]
 pub struct CreateUserData {
@@ -56,6 +59,28 @@ impl AuthUser for User {
 
     fn session_auth_hash(&self) -> &[u8] {
         self.password.as_bytes()
+    }
+}
+
+pub struct LoginRedirect;
+
+impl IntoResponse for LoginRedirect {
+    fn into_response(self) -> Response {
+        info!("Not authenticated, redirect to login");
+        Redirect::to("/login").into_response()
+    }
+}
+
+impl<T> FromRequestParts<T> for AuthenticatedUser where T: Send + Sync, AppState: FromRef<T> {
+    type Rejection = LoginRedirect;
+    async fn from_request_parts(parts: &mut Parts, state: &T) -> Result<Self, Self::Rejection> {
+        let session = AuthSession::<AppState>::from_request_parts(parts, state).await.map_err(|_|LoginRedirect)?;
+        let user: Option<User> = session.user;
+        info!("Validate user");
+        match user {
+            Some(user) => Ok(AuthenticatedUser(user)),
+            None => Err(LoginRedirect),
+        }
     }
 }
 

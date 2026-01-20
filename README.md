@@ -8,7 +8,7 @@ create .env with DATABASE_URL variable set, which includes the password.
 run postgres, for example with docker
     docker run --name postgres -e POSTGRES_PASSWORD=password123 -p 5432:5432 -d postgres
 
-set up the database
+set up the database, install sqlx-cli to run the commands
     sqlx database create
     sqlx migrate run
 

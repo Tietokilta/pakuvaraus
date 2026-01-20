@@ -33,8 +33,9 @@ async fn main() {
 
     let app = admin::router()
         .route_layer(login_required!(state::AppState, login_url = "/login"))
+        .merge(handlers::router())
+        .with_state(app_state)
         .merge(login::router())
-        .merge(handlers::router(app_state))
         .layer(MessagesManagerLayer)
         .layer(auth_layer);
 

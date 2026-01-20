@@ -31,7 +31,7 @@ struct ChangePasswordTemplate {
 
 }
 
-pub fn router() -> Router<()> {
+pub fn router() -> Router<AppState> {
     Router::new()
         .route("/admin", get(self::get::admin_page))
         .route("/admin/{username}", get(self::get::remove_admin))
@@ -42,6 +42,8 @@ pub fn router() -> Router<()> {
 }
 
 mod get {
+    use crate::users::AuthenticatedUser;
+
     use super::*;
 
     pub async fn admin_page(auth_session: AuthSession<AppState>) -> impl IntoResponse {
@@ -65,20 +67,15 @@ mod get {
         }
     }
 
-    pub async fn new_admin(auth_session: AuthSession<AppState>) -> impl IntoResponse {
-        match &auth_session.user {
-            Some(_) => {
-                Html(
+    pub async fn new_admin(_auth_session: AuthenticatedUser) -> impl IntoResponse {
+        return Html(
                     NewAdminTemplate {
 
                     }
                     .render()
                     .unwrap(),
                     )
-                .into_response()
-            },
-            None => Redirect::to("/login").into_response(),
-        }
+                .into_response();
     }
 
     pub async fn change_password(auth_session: AuthSession<AppState>) -> impl IntoResponse {
