@@ -3,6 +3,7 @@ use axum::{extract::{FromRequestParts, FromRef}, http::{request::Parts}, respons
 use axum_login::{AuthUser, AuthSession};
 use password_auth::{verify_password, generate_hash};
 use tracing::info;
+use std::ops::{Deref, DerefMut};
 
 use crate::state::AppState;
 
@@ -23,8 +24,6 @@ pub struct UserDataObject {
     pub id: i32,
     pub username: String,
 }
-
-pub struct AuthenticatedUser(User);
 
 #[derive(Deserialize)]
 pub struct CreateUserData {
@@ -66,20 +65,39 @@ pub struct LoginRedirect;
 
 impl IntoResponse for LoginRedirect {
     fn into_response(self) -> Response {
-        info!("Not authenticated, redirect to login");
         Redirect::to("/login").into_response()
     }
 }
 
-impl<T> FromRequestParts<T> for AuthenticatedUser where T: Send + Sync, AppState: FromRef<T> {
+pub struct AuthenticatedSession(pub AuthSession<AppState>);
+
+impl Deref for AuthenticatedSession {
+    type Target = AuthSession<AppState>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for AuthenticatedSession {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl<T> FromRequestParts<T> for AuthenticatedSession where T: Send + Sync, AppState: FromRef<T> {
     type Rejection = LoginRedirect;
     async fn from_request_parts(parts: &mut Parts, state: &T) -> Result<Self, Self::Rejection> {
         let session = AuthSession::<AppState>::from_request_parts(parts, state).await.map_err(|_|LoginRedirect)?;
-        let user: Option<User> = session.user;
         info!("Validate user");
-        match user {
-            Some(user) => Ok(AuthenticatedUser(user)),
-            None => Err(LoginRedirect),
+        match &session.user {
+            Some(_user) => {
+                info!("Validated");
+                return Ok(AuthenticatedSession(session))
+            },
+            None => {
+                info!("Validation failed");
+                return Err(LoginRedirect)
+            }
         }
     }
 }
@@ -94,33 +112,28 @@ pub fn check_user_credentials(user: &User, creds: &Credentials) -> bool {
 }
 
 pub async fn add_user(
-    auth_session: &AuthSession<AppState>,
+    auth_session: &AuthenticatedSession,
     user: &CreateUserData
 ) {
     info!("Try to create new user: {}", user.username);
-    match &auth_session.user {
-        Some(_) => {
-            if user.username.len() != 0 && user.password == user.password_again {
-                let res = sqlx::query_as!(
-                    User,
-                    "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username, password",
-                    &user.username,
-                    password_hash(&user.password)
-                )
-                .fetch_one(&auth_session.backend.db_pool)
-                .await;
+    if user.username.len() != 0 && user.password == user.password_again {
+        let res = sqlx::query_as!(
+            User,
+            "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username, password",
+            &user.username,
+            password_hash(&user.password)
+        )
+        .fetch_one(&auth_session.backend.db_pool)
+        .await;
 
-                match res {
-                    Ok(_) => (),
-                    Err(err) => {
-                        info!("Create user failed, database error: {}", err.to_string());
-                    }
-                }
-            } else {
-                info!("Create user data not valid")
+        match res {
+            Ok(_) => (),
+            Err(err) => {
+                info!("Create user failed, database error: {}", err.to_string());
             }
-        },
-        None => info!("Not authorized")
+        }
+    } else {
+        info!("Create user data not valid");
     }
 }
 

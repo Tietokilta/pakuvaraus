@@ -9,7 +9,7 @@ use axum_login::AuthSession;
 
 use crate::state::AppState;
 use crate::logic::{get_reservations, get_admins};
-use crate::users::{CreateUserData, SetUserPasswordData, add_user, set_user_password, remove_user};
+use crate::users::{CreateUserData, SetUserPasswordData, AuthenticatedSession, add_user, set_user_password, remove_user};
 
 #[derive(Template)]
 #[template(path = "admin.html")]
@@ -42,8 +42,6 @@ pub fn router() -> Router<AppState> {
 }
 
 mod get {
-    use crate::users::AuthenticatedUser;
-
     use super::*;
 
     pub async fn admin_page(auth_session: AuthSession<AppState>) -> impl IntoResponse {
@@ -67,15 +65,15 @@ mod get {
         }
     }
 
-    pub async fn new_admin(_auth_session: AuthenticatedUser) -> impl IntoResponse {
+    pub async fn new_admin(_session: AuthenticatedSession) -> impl IntoResponse {
         return Html(
-                    NewAdminTemplate {
+            NewAdminTemplate {
 
-                    }
-                    .render()
-                    .unwrap(),
-                    )
-                .into_response();
+            }
+            .render()
+            .unwrap(),
+            )
+        .into_response();
     }
 
     pub async fn change_password(auth_session: AuthSession<AppState>) -> impl IntoResponse {
@@ -108,14 +106,9 @@ mod get {
 mod post {
     use super::*;
 
-    pub async fn new_admin(auth_session: AuthSession<AppState>, Form(payload): Form<CreateUserData>) -> impl IntoResponse {
-        match &auth_session.user {
-            Some(_) => {
-                add_user(&auth_session, &payload).await;
-                Redirect::to("/admin").into_response()
-            },
-            None => Redirect::to("/login").into_response(),
-        }
+    pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<CreateUserData>) -> impl IntoResponse {
+        add_user(&auth_session, &payload).await;
+        Redirect::to("/admin").into_response()
     }
 
     pub async fn change_password(auth_session: AuthSession<AppState>, Form(payload): Form<SetUserPasswordData>) -> impl IntoResponse {
