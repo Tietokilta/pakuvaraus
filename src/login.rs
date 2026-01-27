@@ -1,3 +1,4 @@
+use askama::Template;
 use axum::{
     response::{Html, IntoResponse, Redirect},
     extract::Form,
@@ -11,6 +12,12 @@ use tracing::info;
 
 use crate::state::AppState;
 use crate::users::Credentials;
+
+#[derive(Template)]
+#[template(path = "login.html")]
+struct LoginTemplate {
+
+}
 
 pub fn router() -> Router<()> {
     Router::new()
@@ -54,22 +61,14 @@ mod get {
     use super::*;
 
     pub async fn login() -> impl IntoResponse {
-        Html(r#"
-            <!doctype html>
-            <html>
-                <head><title>Login</title></head>
-                <body>
-                    <h1>Login</h1>
-                    <form action="/login" method="post">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username"><br><br>
-                        <label for="password">Password:</label>
-                        <input type="password" id="password" name="password"><br><br>
-                        <input type="submit" value="Login">
-                    </form>
-                </body>
-            </html>
-        "#)
+        Html(
+            LoginTemplate {
+
+            }
+            .render()
+            .unwrap(),
+            )
+        .into_response()
     }
 
     pub async fn logout(mut auth_session: AuthSession<AppState>) -> impl IntoResponse {
