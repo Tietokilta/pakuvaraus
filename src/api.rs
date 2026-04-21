@@ -1,2 +1,3 @@
 pub mod routes;
-pub mod handlers;
+pub mod get_reservations;
+pub mod make_reservation;

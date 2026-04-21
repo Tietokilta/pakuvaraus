@@ -35,7 +35,7 @@ async fn main() {
         .route_layer(login_required!(state::AppState, login_url = "/login"))
         .merge(api::routes::router())
         .with_state(app_state)
-        .merge(login::router())
+        .merge(login::routes::router())
         .layer(MessagesManagerLayer)
         .layer(auth_layer);
 

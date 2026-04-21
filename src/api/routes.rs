@@ -3,10 +3,11 @@ use axum::{
     Router,
 };
 use crate::state::AppState;
-use super::handlers::{handle_reservation, handle_get_reservations};
+use super::get_reservations::get_reservations;
+use super::make_reservation::make_reservation;
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/reservations", post(handle_reservation))
-        .route("/reservations", get(handle_get_reservations))
+        .route("/reservations", post(get_reservations))
+        .route("/reservations", get(make_reservation))
 }
