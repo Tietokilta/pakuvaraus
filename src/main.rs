@@ -8,7 +8,7 @@ use tracing::info;
 use tracing_subscriber;
 
 mod admin;
-mod handlers;
+mod api;
 mod logic;
 mod login;
 mod reservations;
@@ -31,9 +31,9 @@ async fn main() {
     let app_state = state::new().await;
     let auth_layer = AuthManagerLayerBuilder::new(app_state.clone(), session_layer).build();
 
-    let app = admin::router()
+    let app = admin::routes::router()
         .route_layer(login_required!(state::AppState, login_url = "/login"))
-        .merge(handlers::router())
+        .merge(api::routes::router())
         .with_state(app_state)
         .merge(login::router())
         .layer(MessagesManagerLayer)
