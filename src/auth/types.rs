@@ -6,12 +6,6 @@ pub struct Credentials {
     pub password: String,
 }
 
-#[derive(Deserialize)] 
-pub struct LoginRequest {
-    pub email: String,
-    pub password: String,
-}
-
 #[derive(Deserialize)]
 pub struct RegisterUserRequest {
     pub username: String,
