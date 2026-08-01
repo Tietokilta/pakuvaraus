@@ -9,11 +9,13 @@ use tracing_subscriber;
 
 mod admin;
 mod api;
+mod auth;
 mod logic;
 mod login;
 mod reservations;
 mod state;
 mod users;
+mod user;
 
 #[tokio::main]
 async fn main() {

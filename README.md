@@ -26,3 +26,5 @@ Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Get
 
 in browser open
     http://127.0.0.1:3000/login
+
+sqlx can check queries at compile time, but this requires a postgres instance to be running, if such is not available, set sqlx to offline mode
