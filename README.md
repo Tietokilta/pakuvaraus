@@ -23,3 +23,6 @@ $body = @{
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Post -ContentType "application/json" -Body ($body | ConvertTo-Json)
 
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Get
+
+in browser open
+    http://127.0.0.1:3000/login

@@ -4,6 +4,7 @@ use axum_login::AuthSession;
 use crate::state::AppState;
 use crate::reservations::{Reservation, CreateReservation, ReservationValidation};
 use crate::users::UserDataObject;
+use tracing::info;
 
 async fn validate_reservation(
     reservation: &CreateReservation
@@ -22,6 +23,7 @@ pub async fn add_reservation(
     let valid= validate_reservation(reservation).await;
 
     if valid.is_valid {
+        info!("Reservation is valid");
         let res = sqlx::query_as!(
             Reservation,
             "INSERT INTO reservations (reservation_name, start_time, end_time) VALUES ($1, $2, $3) RETURNING id, reservation_name, start_time, end_time",

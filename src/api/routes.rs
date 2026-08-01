@@ -8,6 +8,6 @@ use super::make_reservation::make_reservation;
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/reservations", post(get_reservations))
-        .route("/reservations", get(make_reservation))
+        .route("/reservations", post(make_reservation))
+        .route("/reservations", get(get_reservations))
 }
