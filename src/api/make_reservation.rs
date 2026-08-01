@@ -1,7 +1,7 @@
 use axum::{
     extract::{Json, State},
 };
-use crate::state::AppState;
+use crate::state::app_state::AppState;
 use crate::reservations::{CreateReservation, ReservationValidation};
 use crate::logic::{add_reservation};
 use tracing::info;

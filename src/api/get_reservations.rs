@@ -1,7 +1,7 @@
 use axum::{
     extract::{Json, State},
 };
-use crate::state::AppState;
+use crate::state::app_state::AppState;
 use crate::reservations::{Reservation};
 
 pub async fn get_reservations(State(state): State<AppState>) -> Json<Vec<Reservation>> {

@@ -4,7 +4,8 @@ use axum::{
     response::{Html, IntoResponse, Redirect},
 };
 
-use crate::users::{SetUserPasswordData, AuthenticatedSession, set_user_password};
+use crate::auth::types::{ChangePasswordRequest, PlainPassword};
+use crate::auth::auth_session::AuthenticatedSession;
 
 #[derive(Template)]
 #[template(path = "change_password.html")]
@@ -23,7 +24,21 @@ pub async fn get_change_password_page(_auth_session: AuthenticatedSession) -> im
     .into_response()
 }
 
-pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): Form<SetUserPasswordData>) -> impl IntoResponse {
-    set_user_password(&auth_session, &payload).await;
-    Redirect::to("/admin").into_response()
+pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): Form<ChangePasswordRequest>) -> impl IntoResponse {
+    match &auth_session.user {
+        Some(user) => {
+            crate::auth::change_password::change_password(
+                &auth_session.backend.db_pool,
+                user.id,
+                PlainPassword(user.password.clone()),
+                PlainPassword(payload.old_password),
+                PlainPassword(payload.password),
+                PlainPassword(payload.password_again)
+            ).await;
+            Redirect::to("/admin").into_response();
+        },
+        None => {
+            Redirect::to("/login").into_response();
+        }
+    }
 }

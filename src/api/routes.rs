@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use crate::state::AppState;
+use crate::state::app_state::AppState;
 use super::get_reservations::get_reservations;
 use super::make_reservation::make_reservation;
 

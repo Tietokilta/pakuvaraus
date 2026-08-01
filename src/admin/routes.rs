@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use crate::state::AppState;
+use crate::state::app_state::AppState;
 use super::admin_page::admin_page;
 use super::change_password::{get_change_password_page, change_password};
 use super::new_admin::{get_new_admin_page, new_admin};

@@ -8,8 +8,8 @@ use axum_login::AuthSession;
 use axum_messages::Messages;
 use tracing::info;
 
-use crate::state::AppState;
-use crate::users::Credentials;
+use crate::state::app_state::AppState;
+use crate::auth::types::Credentials;
 
 #[derive(Template)]
 #[template(path = "login.html")]

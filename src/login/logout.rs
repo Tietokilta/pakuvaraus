@@ -4,7 +4,7 @@ use axum::{
 };
 use axum_login::AuthSession;
 
-use crate::state::AppState;
+use crate::state::app_state::AppState;
 
 pub async fn logout(mut auth_session: AuthSession<AppState>) -> impl IntoResponse {
     match auth_session.logout().await {

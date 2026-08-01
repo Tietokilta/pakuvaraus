@@ -1,9 +1,9 @@
 use sqlx::postgres::PgPool;
 use axum_login::AuthSession;
 
-use crate::state::AppState;
+use crate::state::app_state::AppState;
 use crate::reservations::{Reservation, CreateReservation, ReservationValidation};
-use crate::users::UserDataObject;
+use crate::user::types::UserDataObject;
 use tracing::info;
 
 async fn validate_reservation(

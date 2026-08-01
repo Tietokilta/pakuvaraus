@@ -4,7 +4,8 @@ use axum::{
     response::{Html, IntoResponse, Redirect},
 };
 
-use crate::users::{CreateUserData, AuthenticatedSession, add_user};
+use crate::auth::types::{RegisterUserRequest, PlainPassword};
+use crate::auth::auth_session::AuthenticatedSession;
 
 #[derive(Template)]
 #[template(path = "new_admin.html")]
@@ -23,7 +24,12 @@ pub async fn get_new_admin_page(_auth_session: AuthenticatedSession) -> impl Int
     .into_response()
 }
 
-pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<CreateUserData>) -> impl IntoResponse {
-    add_user(&auth_session, &payload).await;
+pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<RegisterUserRequest>) -> impl IntoResponse {
+    crate::auth::register_user::register_user(
+        &auth_session.backend.db_pool,
+        &payload.username,
+        PlainPassword(payload.password),
+        PlainPassword(payload.password_again),
+    );
     Redirect::to("/admin").into_response()
 }

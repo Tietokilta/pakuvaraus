@@ -4,7 +4,7 @@ use axum::{
 };
 
 use crate::logic::{get_reservations, get_admins};
-use crate::users::{AuthenticatedSession};
+use crate::auth::auth_session::AuthenticatedSession;
 
 #[derive(Template)]
 #[template(path = "admin.html")]
