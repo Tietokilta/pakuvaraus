@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
+use tower_http::services::ServeDir;
 use tower_sessions::{Expiry, SessionManagerLayer, MemoryStore};
 use tower_sessions::cookie::SameSite;
 use axum_login::{AuthManagerLayerBuilder, login_required};
@@ -37,6 +38,7 @@ async fn main() {
         .merge(api::routes::router())
         .with_state(app_state)
         .merge(login::routes::router())
+        .nest_service("/static", ServeDir::new("static"))
         .layer(MessagesManagerLayer)
         .layer(auth_layer);
 

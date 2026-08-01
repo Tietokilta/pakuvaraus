@@ -1,117 +1,82 @@
+<!DOCTYPE html>
+
 <html>
   <head>
     <title>Administrator's page</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-
-      .topbar {
-        margin-bottom: 20px;
-      }
-
-      .box {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 20px;
-        width: 600px;
-      }
-
-      .scroll-box {
-        max-height: 250px;
-        overflow-y: auto;
-        border: 1px solid #ddd;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      th, td {
-        padding: 6px 8px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
-      }
-
-      th {
-        background-color: #f5f5f5;
-        position: sticky;
-        top: 0;
-      }
-
-      a {
-        margin-left: 10px;
-      }
-    </style>
+    <link rel="stylesheet" href="/static/styles.css" />
   </head>
 
   <body>
-    <div class="topbar">
-      <p>Logged in as admin: {{username}}</p>
-      <a href="/admin/password">Change password</a>
-      <a href="/logout">Logout</a>
-    </div>
-
-    <!-- ADMINS -->
-    <div class="box">
-      <b>Administrators</b>
-
-      <div class="scroll-box">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for admin in admins %}
-            <tr>
-              <td>{{ admin.id }}</td>
-              <td><strong>{{ admin.username }}</strong></td>
-              <td>
-                <a href="/admin/{{ admin.id }}/remove">delete</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <div class="card" style="margin: 20px auto; width: 700px;">
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <p><strong>Logged in as admin:</strong> {{username}}</p>
+        <a href="/admin/password">Change password</a>
+        <a href="/logout">Logout</a>
       </div>
 
-      <a href="/admin/new">Create a new administrator</a>
-    </div>
+      <!-- ADMINS -->
+      <div class="box">
+        <h2>Administrators</h2>
 
-    <!-- RESERVATIONS -->
-    <div class="box">
-      <b>Reservations</b>
+        <div class="scroll-box">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for admin in admins %}
+              <tr>
+                <td>{{ admin.id }}</td>
+                <td><strong>{{ admin.username }}</strong></td>
+                <td>
+                  <a href="/admin/{{ admin.id }}/remove">delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
 
-      <div class="scroll-box">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Duration</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for r in reservations %}
-            <tr>
-              <td>{{ r.id }}</td>
-              <td>{{ r.start_time }}</td>
-              <td>{{ r.end_time }}</td>
-              <td>{{ r.duration }}</td>
-              <td>
-                <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div style="margin-top: 10px;">
+          <a href="/admin/new" class="btn">Create new administrator</a>
+        </div>
+      </div>
+
+      <!-- RESERVATIONS -->
+      <div class="box">
+        <h2>Reservations</h2>
+
+        <div class="scroll-box">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.start_time }}</td>
+                <td>{{ r.end_time }}</td>
+                <td>{{ r.duration }}</td>
+                <td>
+                  <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </body>
