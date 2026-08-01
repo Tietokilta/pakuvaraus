@@ -21,7 +21,8 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     let test_password = "pass123";
-    //info!("Test password: {}, hash: {}", test_password, users::password_hash(&test_password.to_string()));
+    let test_plain = auth::types::PlainPassword(test_password.to_string());
+    info!("Test password: {}, hash: {}", test_password, auth::password::get_password_hash(&test_plain).0);
 
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)

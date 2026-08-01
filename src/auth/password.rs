@@ -2,8 +2,8 @@ use password_auth::{verify_password, generate_hash};
 
 use super::types::{PasswordHash, PlainPassword};
 
-pub fn get_password_hash(password: PlainPassword) -> PasswordHash {
-    return PasswordHash(generate_hash(password.0));
+pub fn get_password_hash(password: &PlainPassword) -> PasswordHash {
+    return PasswordHash(generate_hash(password.0.clone()));
 }
 
 pub fn check_plain_password(password: PlainPassword, hash: PasswordHash) -> bool {

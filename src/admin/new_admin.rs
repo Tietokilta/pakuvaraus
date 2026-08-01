@@ -30,6 +30,6 @@ pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<R
         &payload.username,
         PlainPassword(payload.password),
         PlainPassword(payload.password_again),
-    );
+    ).await;
     Redirect::to("/admin").into_response()
 }

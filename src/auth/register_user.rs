@@ -13,7 +13,7 @@ pub async fn register_user(
     password_again: PlainPassword,
 ) {
     if password.0 == password_again.0 {
-        add_user(db_pool, &username, get_password_hash(password)).await;
+        add_user(db_pool, &username, get_password_hash(&password)).await;
     }
     else {
         info!("Register user failed, password does not match");
