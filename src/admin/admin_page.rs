@@ -3,8 +3,9 @@ use axum::{
     response::{Html, IntoResponse, Redirect},
 };
 
-use crate::logic::{get_reservations, get_admins};
 use crate::auth::auth_session::AuthenticatedSession;
+use crate::reservation::get_reservations_db::get_reservations;
+use crate::user::get_users_db::get_users;
 
 #[derive(Template)]
 #[template(path = "admin.html")]
@@ -18,7 +19,7 @@ pub async fn admin_page(auth_session: AuthenticatedSession) -> impl IntoResponse
     match &auth_session.user {
         Some(user) => {                
             let res = get_reservations(&auth_session.backend.db_pool).await;
-            let admins = get_admins(&auth_session).await;
+            let admins = get_users(&auth_session.backend.db_pool).await;
 
             Html(
                 AdminTemplate {

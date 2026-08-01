@@ -1,18 +1,6 @@
+use super::types::{CreateReservation, ReservationValidation};
 
-
-#[derive(Serialize, Deserialize)]
-pub struct ReservationValidation {
-    pub is_valid: bool,
-    pub reason: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct ValidationConfig {
-    pub min_duration: int,
-    pub max_duration: int,
-}
-
-async fn validate_reservation(
+pub async fn validate_reservation(
     reservation: &CreateReservation
 ) -> ReservationValidation {
     if reservation.end_time < reservation.start_time { 

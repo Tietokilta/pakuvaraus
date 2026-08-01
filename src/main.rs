@@ -10,9 +10,8 @@ use tracing_subscriber;
 mod admin;
 mod api;
 mod auth;
-mod logic;
 mod login;
-mod reservations;
+mod reservation;
 mod state;
 mod user;
 
