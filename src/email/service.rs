@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use std::sync::Arc;
 
 use super::{config::EmailConfig, test::StubService};
 use crate::mailgun::service::MailgunService;
@@ -8,16 +9,17 @@ pub trait EmailSender: Send + Sync {
     async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), String>;
 }
 
+#[derive(Clone)]
 pub struct EmailService {
-    pub sender: Box<dyn EmailSender>
+    pub sender: Arc<dyn EmailSender>
 }
 
 impl EmailService {
     pub async fn from_config(config: &EmailConfig) -> Self {
-        let sender: Box<dyn EmailSender> = if config.enabled {
-            Box::new(MailgunService::create().await)
+        let sender: Arc<dyn EmailSender> = if config.enabled {
+            Arc::new(MailgunService::create().await)
         } else {
-            Box::new(StubService::create())
+            Arc::new(StubService::create())
         };
 
         Self {
