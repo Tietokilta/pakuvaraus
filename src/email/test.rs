@@ -1,0 +1,23 @@
+use async_trait::async_trait;
+
+use super::service::EmailSender;
+
+#[derive(Clone)]
+pub struct StubService {
+
+}
+
+impl StubService {
+    pub fn create() -> Self {
+        Self {
+            
+        }
+    }
+}
+
+#[async_trait]
+impl EmailSender for StubService {
+    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), String> {
+        Ok(())
+    }
+}

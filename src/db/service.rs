@@ -7,7 +7,7 @@ pub struct DbService {
     pub pool: PgPool,
 }
 
-impl DbService{
+impl DbService {
     pub async fn from_config(config: &DbConfig) -> Self {
         let db_pool = PgPool::connect(&config.url)
             .await

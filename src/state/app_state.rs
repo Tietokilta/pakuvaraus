@@ -1,19 +1,18 @@
 //use sqlx::postgres::PgPool;
 //use std::env;
 use dotenv::dotenv;
-use std::sync::Arc;
+//use std::sync::Arc;
 
 use super::app_config::AppConfig;
 use crate::db::service::DbService;
 use crate::email::service::EmailService;
-use crate::mailgun::service::MailgunService;
 
 #[derive(Clone)]
 pub struct AppState {
     //pub db_pool: PgPool,
     pub db: DbService,
     //pub mailgun: MailgunService,
-    pub email: Arc<dyn EmailService>,
+    pub email: EmailService,
 }
 
 pub async fn new() -> AppState {
@@ -23,7 +22,7 @@ pub async fn new() -> AppState {
 
     AppState {
         db: DbService::create().await,
-        email: Arc::new(MailgunService::from_config(&config.mailgun).await),
+        email: EmailService::create().await,
     }
 }
 

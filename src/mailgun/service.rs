@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use reqwest::{Client, multipart::Form};
 
 use super::config::MailgunConfig;
-use crate::email::service::EmailService;
+use crate::email::service::EmailSender;
 
 #[derive(Clone)]
 pub struct MailgunService {
@@ -30,7 +30,7 @@ impl MailgunService {
 }
 
 #[async_trait]
-impl EmailService for MailgunService {
+impl EmailSender for MailgunService {
     async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), String> {
         let form = Form::new()
             .text("from", self.from.clone())

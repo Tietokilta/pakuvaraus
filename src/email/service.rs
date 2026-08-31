@@ -1,17 +1,27 @@
 use async_trait::async_trait;
 
-use super::config::EmailConfig;
+use super::{config::EmailConfig, test::StubService};
 use crate::mailgun::service::MailgunService;
 
 #[async_trait]
-pub trait EmailService: Send + Sync {
+pub trait EmailSender: Send + Sync {
     async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), String>;
+}
+
+pub struct EmailService {
+    pub sender: Box<dyn EmailSender>
 }
 
 impl EmailService {
     pub async fn from_config(config: &EmailConfig) -> Self {
-        if(config.enabled) {
-            return MailgunService::create();
+        let sender: Box<dyn EmailSender> = if config.enabled {
+            Box::new(MailgunService::create().await)
+        } else {
+            Box::new(StubService::create())
+        };
+
+        Self {
+            sender: sender
         }
     }
 

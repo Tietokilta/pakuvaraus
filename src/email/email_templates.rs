@@ -8,10 +8,10 @@ struct ReservationEmailTemplate<'a> {
     pub name: &'a str,
 }
 
-pub async fn send_reservation_email(service: &dyn EmailService, to: &str) {
+pub async fn send_reservation_email(service: &EmailService, to: &str) {
     let html = ReservationEmailTemplate {
         name: to,
     }.render().unwrap();
 
-    service.send(to, "Reservation received", &html).await;
+    service.sender.send(to, "Reservation received", &html).await;
 }
