@@ -26,7 +26,7 @@ pub async fn get_new_admin_page(_auth_session: AuthenticatedSession) -> impl Int
 
 pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<RegisterUserRequest>) -> impl IntoResponse {
     crate::auth::register_user::register_user(
-        &auth_session.backend.db_pool,
+        &auth_session.backend.db.pool,
         &payload.username,
         PlainPassword(payload.password),
         PlainPassword(payload.password_again),

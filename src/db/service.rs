@@ -17,4 +17,8 @@ impl DbService{
             pool: db_pool,
         }
     }
+
+    pub async fn create() -> Self {
+        Self::from_config(&DbConfig::from_env()).await
+    }
 }

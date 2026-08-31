@@ -12,11 +12,13 @@ mod admin;
 mod api;
 mod auth;
 mod db;
+mod email;
 mod login;
 mod mailgun;
 mod reservation;
 mod state;
 mod user;
+mod util;
 
 #[tokio::main]
 async fn main() {

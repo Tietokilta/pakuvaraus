@@ -19,8 +19,8 @@ struct AdminTemplate<'a> {
 pub async fn admin_page(auth_session: AuthenticatedSession) -> impl IntoResponse {
     match &auth_session.user {
         Some(user) => {                
-            let res = get_reservations(&auth_session.backend.db_pool).await;
-            let admins = get_users(&auth_session.backend.db_pool).await;
+            let res = get_reservations(&auth_session.backend.db.pool).await;
+            let admins = get_users(&auth_session.backend.db.pool).await;
 
             Html(
                 AdminTemplate {

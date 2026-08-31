@@ -48,7 +48,7 @@ impl AuthnBackend for AppState {
     ) -> Result<Option<Self::User>, Self::Error> {
         let user: Option<Self::User> = sqlx::query_as("select * from users where username = $1")
             .bind(&creds.username)
-            .fetch_optional(&self.db_pool)
+            .fetch_optional(&self.db.pool)
             .await?;
         
         task::spawn_blocking(move || {
@@ -61,7 +61,7 @@ impl AuthnBackend for AppState {
         info!("Get user");
         let user = sqlx::query_as("select * from users where id = $1")
             .bind(user_id)
-            .fetch_optional(&self.db_pool)
+            .fetch_optional(&self.db.pool)
             .await?;
 
         Ok(user)

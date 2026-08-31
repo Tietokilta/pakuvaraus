@@ -31,7 +31,7 @@ pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): 
         Some(user) => {
             info!("Change password for user {}", user.username);
             crate::auth::change_password::change_password(
-                &auth_session.backend.db_pool,
+                &auth_session.backend.db.pool,
                 user.id,
                 PasswordHash(user.password.clone()),
                 PlainPassword(payload.old_password),
