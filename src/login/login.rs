@@ -41,8 +41,8 @@ pub async fn login(
 
             return Redirect::to("/login").into_response();
         }
-        Err(_) => {
-            info!("Error");
+        Err(e) => {
+            info!("Error: {e}");
             return StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }
     };
