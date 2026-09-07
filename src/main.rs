@@ -12,6 +12,7 @@ mod admin;
 mod api;
 mod auth;
 mod db;
+mod domain;
 mod email;
 mod login;
 mod mailgun;

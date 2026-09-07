@@ -26,7 +26,7 @@ pub async fn admin_page(auth_session: AuthenticatedSession) -> impl IntoResponse
                 AdminTemplate {
                     //reservations: res.iter().map(|r| r.reservation_name.clone()).collect(),
                     //admins: admins.iter().map(|a| a.username.clone()).collect(),
-                    reservations: res.iter().map(|r| ReservationView::from_domain(r.id, r.start_time, r.end_time)).collect(),
+                    reservations: res.iter().map(|r| ReservationView::from_domain(r.id, r.start_time, r.end_time, r.email.as_str())).collect(),
                     admins: admins.iter().map(|u| UserView::from_domain(u.id, u.username.clone())).collect(),
                     username: &user.username,
                 }

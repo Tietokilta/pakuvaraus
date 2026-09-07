@@ -15,7 +15,7 @@ pub async fn make_reservation(
     info!("Make reservation");
     let valid= crate::reservation::add_reservation_db::add_reservation(&state.db.pool, &payload).await;
     if valid.is_valid {
-        send_reservation_email(&state.email, "a").await;
+        send_reservation_email(&state.email, &payload.email).await;
     }
     Json(valid)
 }

@@ -1,4 +1,8 @@
+use std::str::FromStr;
+
 use chrono::{DateTime, Utc};
+
+use crate::domain::email;
 
 //Helper
 
@@ -26,6 +30,7 @@ pub struct ReservationView {
     pub start_time: String,
     pub end_time: String,
     pub duration: String,
+    pub email: String,
 }
 
 //Conversion
@@ -41,6 +46,7 @@ impl ReservationView {
         id: i32,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
+        email: &str,
     ) -> Self {
         let duration = end - start;
 
@@ -49,6 +55,7 @@ impl ReservationView {
             start_time: format_time(start),
             end_time: format_time(end),
             duration: format_duration(duration),
+            email: email.to_string(),
         }
     }
 }

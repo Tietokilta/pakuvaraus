@@ -59,6 +59,7 @@
                 <th>Start</th>
                 <th>End</th>
                 <th>Duration</th>
+                <th>Email</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -69,6 +70,7 @@
                 <td>{{ r.start_time }}</td>
                 <td>{{ r.end_time }}</td>
                 <td>{{ r.duration }}</td>
+                <td>{{ r.email }}</td>
                 <td>
                   <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
                 </td>

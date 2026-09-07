@@ -13,5 +13,5 @@ pub async fn send_reservation_email(service: &EmailService, to: &str) {
         name: to,
     }.render().unwrap();
 
-    service.sender.send(to, "Reservation received", &html).await;
+    service.sender.send(to, "Reservation received", &html).await.ok();
 }

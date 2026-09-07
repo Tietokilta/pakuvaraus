@@ -16,6 +16,7 @@ add and get reservations in powershell:
 
 $body = @{
     reservation_name = "Test name 1"
+    email = "test@example.com"
     start_time = "2025-10-20T10:00:00.000000Z"
     end_time = "2025-10-20T12:00:00.000000Z"
 }
