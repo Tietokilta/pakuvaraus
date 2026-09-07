@@ -13,7 +13,7 @@ set up the database, install sqlx-cli to run the commands
     sqlx migrate run
 
 add and get reservations in powershell:
-
+```powershell
 $body = @{
     reservation_name = "Test name 1"
     email = "test@example.com"
@@ -24,7 +24,16 @@ $body = @{
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Post -ContentType "application/json" -Body ($body | ConvertTo-Json)
 
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Get
-
+```
+or in a posix shell with `curl`
+```sh
+curl 'http://127.0.0.1:3000/reservations' \
+    -H 'Content-Type: application/json' \
+    -d '{"reservation_name": "Test name 1", "start_time": "2025-10-20T10:00:00.000000Z", "end_time": "2025-10-20T10:00:00.000000Z"}'
+```
+```sh
+curl 'http://127.0.0.1:3000/reservations'
+```
 in browser open
     http://127.0.0.1:3000/login
 
