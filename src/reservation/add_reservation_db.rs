@@ -24,21 +24,10 @@ pub async fn add_reservation(
         .fetch_one(db_pool)
         .await;
 
-        match res {
-            Ok(_) => (),
-            Err(err) => {
-                match err.as_database_error() {
-                    Some(db_err) => {
-                        match db_err.constraint()  {
-                            Some(_) => {
-                                return ReservationValidation {is_valid: false, reason: String::from("There is an overlapping reservation")};  
-                            }
-                            None => ()
-                        }
-                    },
-                    None => ()
-                }
-            }
+        if let Err(err) = res
+            && let Some(db_err) = err.as_database_error()
+            && let Some(_) = db_err.constraint() {
+            return ReservationValidation {is_valid: false, reason: String::from("There is an overlapping reservation")};
         }
     }
 

@@ -2,7 +2,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use super::login::{get_login_page, login};
+use super::core::{get_login_page, login};
 use super::logout::logout;
 
 pub fn router() -> Router<()> {

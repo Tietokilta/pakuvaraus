@@ -11,7 +11,7 @@ fn format_duration(dur: chrono::Duration) -> String {
     let hours = total_minutes / 60;
     let minutes = total_minutes % 60;
 
-    format!("{}h {}m", hours, minutes)
+    format!("{hours}h {minutes}m")
 }
 
 //View
@@ -32,7 +32,7 @@ pub struct ReservationView {
 //Conversion
 
 impl UserView {
-    pub fn from_domain(id: i32, username: String) -> Self {
+    pub const fn from_domain(id: i32, username: String) -> Self {
         Self { id, username }
     }
 }

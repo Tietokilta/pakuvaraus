@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use crate::domain::email::Email;
 
 #[derive(sqlx::FromRow)]
+#[allow(clippy::struct_field_names,unused)]
 pub struct Reservation {
     pub id: i32,
     pub reservation_name: String,
@@ -41,6 +42,7 @@ pub struct ReservationValidation {
     pub reason: String,
 }
 
+#[allow(unused)]
 pub struct ValidationResult {
     pub valid: ReservationValidation,
     pub reservation: Option<Reservation>,

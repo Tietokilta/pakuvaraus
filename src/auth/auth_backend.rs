@@ -52,7 +52,7 @@ impl AuthnBackend for AppState {
             .await?;
         
         task::spawn_blocking(move || {
-            Ok(user.filter(|user| check_plain_password(PlainPassword(creds.password), PasswordHash(user.password.clone()))))
+            Ok(user.filter(|user| check_plain_password(PlainPassword(creds.password), &PasswordHash(user.password.clone()))))
         })
         .await?
     }

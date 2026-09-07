@@ -4,7 +4,7 @@ use crate::domain::email::Email;
 pub async fn validate_reservation(
     reservation: &CreateReservation
 ) -> ReservationValidation {
-    if reservation.end_time < reservation.start_time { 
+    if reservation.end_time < reservation.start_time {
         return ReservationValidation {is_valid: false, reason: String::from("Start time must be before end time")};
     }
 

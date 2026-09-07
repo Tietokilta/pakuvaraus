@@ -3,6 +3,20 @@ name = "pakuvaraus"
 version = "0.1.0"
 edition = "2024"
 
+[lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+redundant_field_names = "allow"
+indexing_slicing = "deny"
+unreachable = "deny"
+unimplemented = "deny"
+unchecked_time_subtraction = "deny"
+string_slice = "deny"
+panic_in_result_fn = "deny"
+panic = "deny"
+exit = "deny"
+as_conversions = "deny"
+
 [dependencies]
 axum = "0.8.5"
 axum-login = "0.18.0"

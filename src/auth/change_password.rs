@@ -14,7 +14,7 @@ pub async fn change_password(
     new_password: PlainPassword,
     new_password_again: PlainPassword,
 ) {
-    if check_plain_password(old_password, current_password) {
+    if check_plain_password(old_password, &current_password) {
         if new_password.0 == new_password_again.0 {
             set_password(db_pool, user_id, get_password_hash(&new_password)).await;
         } 

@@ -9,10 +9,8 @@ pub struct StubService {
 }
 
 impl StubService {
-    pub fn create() -> Self {
-        Self {
-            
-        }
+    pub const fn create() -> Self {
+        Self { }
     }
 }
 

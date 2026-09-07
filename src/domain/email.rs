@@ -21,6 +21,6 @@ impl Email {
 
 impl From<String> for Email {
     fn from(s: String) -> Self {
-        Email(s)
+        Self(s)
     }
 }

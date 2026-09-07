@@ -15,9 +15,9 @@ pub struct EmailService {
 }
 
 impl EmailService {
-    pub async fn from_config(config: &EmailConfig) -> Self {
+    pub fn from_config(config: &EmailConfig) -> Self {
         let sender: Arc<dyn EmailSender> = if config.enabled {
-            Arc::new(MailgunService::create().await)
+            Arc::new(MailgunService::create())
         } else {
             Arc::new(StubService::create())
         };
@@ -27,7 +27,7 @@ impl EmailService {
         }
     }
 
-    pub async fn create() -> Self {
-        Self::from_config(&&EmailConfig::from_env()).await
+    pub fn create() -> Self {
+        Self::from_config(&EmailConfig::from_env())
     }
 }
