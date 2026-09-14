@@ -7,6 +7,7 @@ use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::{MessagesManagerLayer};
 use tracing::info;
 
+mod pdfgen;
 mod admin;
 mod api;
 mod auth;
