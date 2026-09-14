@@ -4,6 +4,8 @@ CREATE TABLE reservations (
     email TEXT NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
+    internal BOOLEAN NOT NULL,
+    approved BOOLEAN NOT NULL,
     CONSTRAINT block_overlapping_times
     EXCLUDE USING gist (
         tstzrange(start_time, end_time) WITH &&

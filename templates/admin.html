@@ -49,7 +49,7 @@
 
       <!-- RESERVATIONS -->
       <div class="box">
-        <h2>Reservations</h2>
+        <h2>Pending reservations</h2>
 
         <div class="scroll-box">
           <table>
@@ -60,6 +60,7 @@
                 <th>End</th>
                 <th>Duration</th>
                 <th>Email</th>
+                <th>Guild</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -71,6 +72,43 @@
                 <td>{{ r.end_time }}</td>
                 <td>{{ r.duration }}</td>
                 <td>{{ r.email }}</td>
+                <td>{{ r.internal }}</td>
+                <td>
+                  <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
+                  <a href="/admin/reservations/{{ r.id }}/approve">approve</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="box">
+        <h2>Approved reservations</h2>
+
+        <div class="scroll-box">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+                <th>Email</th>
+                <th>Guild</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in approved_reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.start_time }}</td>
+                <td>{{ r.end_time }}</td>
+                <td>{{ r.duration }}</td>
+                <td>{{ r.email }}</td>
+                <td>{{ r.internal }}</td>
                 <td>
                   <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
                 </td>

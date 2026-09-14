@@ -11,6 +11,8 @@ pub struct Reservation {
     pub email: Email,
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,
+    pub internal: bool,
+    pub approved: bool,
 }
 
 #[derive(Deserialize)]
@@ -19,6 +21,7 @@ pub struct CreateReservation {
     pub email: String,
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,
+    pub internal: bool,
 }
 
 #[derive(Serialize)]

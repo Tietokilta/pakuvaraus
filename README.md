@@ -19,6 +19,7 @@ $body = @{
     email = "test@example.com"
     start_time = "2025-10-20T10:00:00.000000Z"
     end_time = "2025-10-20T12:00:00.000000Z"
+    internal = $true
 }
 
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Post -ContentType "application/json" -Body ($body | ConvertTo-Json)

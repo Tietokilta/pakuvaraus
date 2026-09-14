@@ -15,11 +15,13 @@ pub async fn add_reservation(
         info!("Reservation is valid");
         let res = sqlx::query_as!(
             Reservation,
-            "INSERT INTO reservations (reservation_name, email, start_time, end_time) VALUES ($1, $2, $3, $4) RETURNING id, reservation_name, email, start_time, end_time",
+            "INSERT INTO reservations (reservation_name, email, start_time, end_time, internal, approved) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, reservation_name, email, start_time, end_time, internal, approved",
             reservation.reservation_name,
             reservation.email,
             reservation.start_time,
-            reservation.end_time
+            reservation.end_time,
+            reservation.internal,
+            false
         )
         .fetch_one(db_pool)
         .await;

@@ -27,6 +27,7 @@ pub struct ReservationView {
     pub end_time: String,
     pub duration: String,
     pub email: String,
+    pub internal: bool,
 }
 
 //Conversion
@@ -43,6 +44,7 @@ impl ReservationView {
         start: DateTime<Utc>,
         end: DateTime<Utc>,
         email: &str,
+        internal: bool,
     ) -> Self {
         let duration = end - start;
 
@@ -52,6 +54,7 @@ impl ReservationView {
             end_time: format_time(end),
             duration: format_duration(duration),
             email: email.to_string(),
+            internal,
         }
     }
 }
