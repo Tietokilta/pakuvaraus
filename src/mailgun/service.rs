@@ -14,7 +14,7 @@ pub struct MailgunService {
 }
 
 impl MailgunService {
-    pub async fn from_config(config: &MailgunConfig) -> Self {
+    pub fn from_config(config: &MailgunConfig) -> Self {
         Self {
             client: Client::new(),
             url: config.url.clone(),
@@ -24,8 +24,8 @@ impl MailgunService {
         }
     }
 
-    pub async fn create() -> Self {
-        Self::from_config(&&MailgunConfig::from_env()).await
+    pub fn create() -> Self {
+        Self::from_config(&MailgunConfig::from_env())
     }
 }
 

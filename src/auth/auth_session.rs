@@ -26,15 +26,11 @@ impl<T> FromRequestParts<T> for AuthenticatedSession where T: Send + Sync, AppSt
     async fn from_request_parts(parts: &mut Parts, state: &T) -> Result<Self, Self::Rejection> {
         let session = AuthSession::<AppState>::from_request_parts(parts, state).await.map_err(|_|LoginRedirect)?;
         info!("Validate user");
-        match &session.user {
-            Some(_user) => {
-                info!("Validated");
-                return Ok(AuthenticatedSession(session))
-            },
-            None => {
-                info!("Validation failed");
-                return Err(LoginRedirect)
-            }
+        if let Some(_user) = &session.user {
+            info!("Validated");
+            return Ok(Self(session));
         }
+        info!("Validation failed");
+        Err(LoginRedirect)
     }
 }

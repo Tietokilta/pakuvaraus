@@ -10,7 +10,9 @@ pub async fn add_user(
     password: PasswordHash
 ) {
     info!("Try to create new user: {}", username);
-    if username.len() != 0 {
+    if username.is_empty() {
+        info!("Create user data not valid");
+    } else {
         let res = sqlx::query_as!(
             User,
             "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username, password",
@@ -26,7 +28,5 @@ pub async fn add_user(
                 info!("Create user failed, database error: {}", err.to_string());
             }
         }
-    } else {
-        info!("Create user data not valid");
     }
 }

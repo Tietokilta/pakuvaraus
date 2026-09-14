@@ -38,10 +38,10 @@ pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): 
                 PlainPassword(payload.password),
                 PlainPassword(payload.password_again)
             ).await;
-            return Redirect::to("/admin").into_response();
+            Redirect::to("/admin").into_response()
         },
         None => {
-            return Redirect::to("/login").into_response();
+            Redirect::to("/login").into_response()
         },
     }
 }

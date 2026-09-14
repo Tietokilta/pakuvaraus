@@ -6,7 +6,6 @@ use tower_sessions::cookie::SameSite;
 use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::{MessagesManagerLayer};
 use tracing::info;
-use tracing_subscriber;
 
 mod admin;
 mod api;
@@ -33,8 +32,8 @@ async fn main() {
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(false)
         .with_same_site(SameSite::Lax)
-        .with_expiry(Expiry::OnSessionEnd);    
-    
+        .with_expiry(Expiry::OnSessionEnd);
+
     let app_state = state::app_state::new().await;
     let auth_layer = AuthManagerLayerBuilder::new(app_state.clone(), session_layer).build();
 
@@ -51,15 +50,15 @@ async fn main() {
 
     let listener = match TcpListener::bind(addr).await {
         Ok(listener) => {
-            println!("Listen on {}", addr);
+            println!("Listen on {addr}");
             listener
         },
         Err(e) => {
-            eprintln!("Listener bind failed on address {}: {}", addr, e);
+            eprintln!("Listener bind failed on address {addr}: {e}");
             return;
         }
     };
-    
+
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();

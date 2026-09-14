@@ -18,7 +18,7 @@ pub async fn remove_user(
             info!("User successfully deleted: {}", user_id);                        
         },
         Err(err) => {
-            info!("Remove user failed, database error: {}", err.to_string());
+            info!("Remove user failed, database error: {err}");
         }
     }
 }

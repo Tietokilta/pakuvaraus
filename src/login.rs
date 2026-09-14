@@ -1,3 +1,3 @@
 pub mod routes;
-pub mod login;
+pub mod core;
 pub mod logout;

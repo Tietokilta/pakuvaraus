@@ -14,6 +14,6 @@ pub async fn new() -> AppState {
 
     AppState {
         db: DbService::create().await,
-        email: EmailService::create().await,
+        email: EmailService::create(),
     }
 }
