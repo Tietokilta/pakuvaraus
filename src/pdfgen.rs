@@ -1,5 +1,4 @@
 #![allow(unused)]
-
 mod generate;
 mod typstworld;
 mod fonts;

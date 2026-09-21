@@ -1,14 +1,18 @@
-use axum::{
-    response::{IntoResponse, Redirect},
-    http::StatusCode,
-};
+use anyhow::Context;
+use axum::response::Redirect;
 use axum_login::AuthSession;
 
-use crate::state::app_state::AppState;
+use crate::{error::AppResult, state::app_state::AppState};
 
-pub async fn logout(mut auth_session: AuthSession<AppState>) -> impl IntoResponse {
-    match auth_session.logout().await {
-        Ok(_) => Redirect::to("/login").into_response(),
-        Err(_) => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
-    }
+pub async fn logout(mut auth_session: AuthSession<AppState>) -> AppResult<Redirect> {
+    auth_session.logout().await.with_context(|| {
+        format!(
+            "panic while logging out {}",
+            auth_session
+                .user
+                .map_or_else(|| "[missing user]".to_owned(), |u| u.username.into())
+        )
+    })?;
+
+    Ok(Redirect::to("/login"))
 }

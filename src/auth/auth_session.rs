@@ -1,36 +1,43 @@
-use axum::{extract::{FromRequestParts, FromRef}, http::{request::Parts}};
+use anyhow::anyhow;
+use axum::{
+    extract::{FromRef, FromRequestParts},
+    http::request::Parts,
+    response::{IntoResponse, Response},
+};
 use axum_login::AuthSession;
 use tracing::info;
-use std::ops::{Deref, DerefMut};
 
-use super::login_redirect::LoginRedirect;
-use crate::state::app_state::AppState;
+use crate::{
+    auth::login_redirect::LoginRedirect, error::AppError, state::app_state::AppState,
+    user::types::User,
+};
 
-pub struct AuthenticatedSession(pub AuthSession<AppState>);
-
-impl Deref for AuthenticatedSession {
-    type Target = AuthSession<AppState>;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
+pub struct AuthenticatedSession {
+    pub session: AuthSession<AppState>,
+    pub user: User,
 }
 
-impl DerefMut for AuthenticatedSession {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
+impl<T> FromRequestParts<T> for AuthenticatedSession
+where
+    T: Send + Sync,
+    AppState: FromRef<T>,
+{
+    type Rejection = Response;
+    async fn from_request_parts(parts: &mut Parts, state: &T) -> Result<Self, Response> {
+        let session: AuthSession<AppState> =
+            AuthSession::<AppState>::from_request_parts(parts, state)
+                .await
+                .map_err(|_| {
+                    AppError::Anyhow(anyhow!("failed to build authsession from request"))
+                        .into_response()
+                })?;
 
-impl<T> FromRequestParts<T> for AuthenticatedSession where T: Send + Sync, AppState: FromRef<T> {
-    type Rejection = LoginRedirect;
-    async fn from_request_parts(parts: &mut Parts, state: &T) -> Result<Self, Self::Rejection> {
-        let session = AuthSession::<AppState>::from_request_parts(parts, state).await.map_err(|_|LoginRedirect)?;
         info!("Validate user");
-        if let Some(_user) = &session.user {
+        if let Some(user) = session.user.clone() {
             info!("Validated");
-            return Ok(Self(session));
+            return Ok(Self { session, user, });
         }
         info!("Validation failed");
-        Err(LoginRedirect)
+        Err(LoginRedirect.into_response())
     }
 }

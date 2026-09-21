@@ -7,6 +7,7 @@ use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::{MessagesManagerLayer};
 use tracing::info;
 
+mod error;
 mod pdfgen;
 mod admin;
 mod api;
@@ -27,7 +28,7 @@ async fn main() {
 
     let test_password = "pass123";
     let test_plain = auth::types::PlainPassword(test_password.to_string());
-    info!("Test password: {}, hash: {}", test_password, auth::password::get_password_hash(&test_plain).0);
+    info!("Test password: {}, hash: {}", test_password, auth::password::get_password_hash(test_plain).await.unwrap().as_str());
 
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)

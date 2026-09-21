@@ -1,24 +1,22 @@
 use sqlx::PgPool;
 use tracing::info;
 
+use crate::db::{DbError, UpdateOutcome};
+
 pub async fn remove_reservation(
     db_pool: &PgPool,
     id: i32,
-) {
+) -> Result<UpdateOutcome, DbError> {
     info!("Try to remove reservation: {}", id);
     let res = sqlx::query!(
         "DELETE FROM reservations WHERE id = $1",
         id
     )
-    .fetch_one(db_pool)
-    .await;
+    .execute(db_pool)
+    .await?;
 
-    match res {
-        Ok(_) => {
-            info!("Reservation successfully deleted: {}", id);                        
-        },
-        Err(err) => {
-            info!("Remove reservation failed, database error: {}", err.to_string());
-        }
-    }
+    Ok(UpdateOutcome::from(res)).inspect(|o| match o {
+        UpdateOutcome::Updated => info!("Reservation successfully deleted: {id}"),
+        UpdateOutcome::NotFound => info!("Remove reservation failed, not found: {id}"),
+    })
 }

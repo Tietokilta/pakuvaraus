@@ -1,46 +1,43 @@
 use askama::Template;
 use axum::{
-    extract::{Form},
-    response::{Html, IntoResponse, Redirect},
+    extract::Form,
+    response::{Html, Redirect},
 };
 
-use crate::auth::types::ChangePasswordRequest;
-use crate::auth::auth_session::AuthenticatedSession;
+use crate::auth::{auth_session::AuthenticatedSession, change_password::ChangePasswordError};
+use crate::{auth::types::ChangePasswordRequest, error::AppResult};
 
 use tracing::info;
 
 #[derive(Template)]
 #[template(path = "change_password.html")]
-struct ChangePasswordTemplate {
+struct ChangePasswordTemplate {}
 
+pub async fn get_change_password_page(
+    _auth_session: AuthenticatedSession,
+) -> AppResult<Html<String>> {
+    Ok(Html(ChangePasswordTemplate {}.render()?))
 }
 
-pub async fn get_change_password_page(_auth_session: AuthenticatedSession) -> impl IntoResponse {
-    Html(
-        ChangePasswordTemplate {
+pub async fn change_password(
+    auth_session: AuthenticatedSession,
+    Form(payload): Form<ChangePasswordRequest>,
+) -> AppResult<Redirect> {
+    let user = auth_session.user;
+    info!("Change password for user {}", user.username);
+    let res = crate::auth::change_password::change_password(
+        &auth_session.session.backend.db.pool,
+        user.id,
+        user.password.clone(),
+        payload.old_password,
+        payload.new_password,
+    )
+    .await;
 
-        }
-        .render()
-        .unwrap(),
-        )
-    .into_response()
-}
-
-pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): Form<ChangePasswordRequest>) -> impl IntoResponse {
-    match &auth_session.user {
-        Some(user) => {
-            info!("Change password for user {}", user.username);
-            crate::auth::change_password::change_password(
-                &auth_session.backend.db.pool,
-                user.id,
-                user.password.clone(),
-                payload.old_password,
-                &payload.new_password,
-            ).await;
-            Redirect::to("/admin").into_response()
-        },
-        None => {
-            Redirect::to("/login").into_response()
-        },
+    match res {
+        Ok(()) => Ok(Redirect::to("/admin")),
+        // TODO: return something that lets the user know the password was wrong
+        Err(ChangePasswordError::WrongPassword) => Ok(Redirect::to("/admin/password")),
+        Err(err) => Err(err.into()),
     }
 }

@@ -1,28 +1,23 @@
 use sqlx::postgres::PgPool;
 
-use crate::reservation::types::{Reservation, CreateReservation, ReservationValidation};
+use crate::db::{DbError, ResultExt};
+use crate::reservation::types::CreateReservation;
 
 pub async fn add_reservation(
     db_pool: &PgPool,
-    reservation: &CreateReservation
-) -> ReservationValidation {
-    let res = sqlx::query_as!(
-        Reservation,
-        r#"INSERT INTO reservations (full_name, email, start_time, end_time, internal, approved) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, full_name AS "full_name: _", email AS "email: _", start_time, end_time, internal, approved"#,
+    reservation: &CreateReservation,
+) -> Result<(), DbError> {
+    sqlx::query!(
+        r#"INSERT INTO reservations (full_name, email, start_time, end_time, internal) VALUES ($1, $2, $3, $4, $5)"#,
         reservation.full_name.as_str(),
         reservation.email.as_str(),
         reservation.time.start(),
         reservation.time.end(),
         reservation.internal,
-        false
     )
-        .fetch_one(db_pool)
-        .await;
+        .execute(db_pool)
+        .await
+        .on_constraint("block_overlapping_times", |_| DbError::Constraint("there is an overlapping reservation"))?;
 
-    if let Err(err) = res
-    && let Some(db_err) = err.as_database_error()
-    && let Some(_) = db_err.constraint() {
-        return ReservationValidation {is_valid: false, reason: String::from("There is an overlapping reservation")};
-    }
-    ReservationValidation {is_valid: true, reason: "is valid".to_string()}
+    Ok(())
 }

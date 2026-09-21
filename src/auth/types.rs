@@ -51,6 +51,10 @@ impl NewPassword {
     pub const fn as_plain(&self) -> &PlainPassword {
         &self.0
     }
+
+    pub fn into_plain(self) -> PlainPassword {
+        self.0
+    }
 }
 
 impl TryFrom<RawNewPassword> for NewPassword {
