@@ -2,7 +2,10 @@ use axum_login::{AuthUser, AuthnBackend, UserId};
 use tokio::task;
 use tracing::info;
 
-use super::{types::{Credentials, PlainPassword, PasswordHash}, password::check_plain_password};
+use super::{
+    password::check_plain_password,
+    types::Credentials,
+};
 use crate::state::app_state::AppState;
 use crate::user::types::User;
 
@@ -24,7 +27,7 @@ impl AuthUser for User {
     }
 
     fn session_auth_hash(&self) -> &[u8] {
-        self.password.as_bytes()
+        self.password.as_str().as_bytes()
     }
 }
 
@@ -46,15 +49,16 @@ impl AuthnBackend for AppState {
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        let user: Option<Self::User> = sqlx::query_as("select * from users where username = $1")
-            .bind(&creds.username)
-            .fetch_optional(&self.db.pool)
-            .await?;
-        
+        let user = sqlx::query_as!(
+            Self::User,
+            r#"SELECT id, username AS "username: _", password AS "password: _" FROM users WHERE username = $1"#,
+            creds.username.as_str()
+        ).fetch_optional(&self.db.pool)
+         .await?;
+
         task::spawn_blocking(move || {
-            Ok(user.filter(|user| check_plain_password(PlainPassword(creds.password), &PasswordHash(user.password.clone()))))
-        })
-        .await?
+            Ok(user.filter(|user| check_plain_password(creds.password, &user.password)))
+        }).await?
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {

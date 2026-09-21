@@ -4,5 +4,3 @@ pub mod get_reservations_db;
 pub mod overlap;
 pub mod remove_reservation_db;
 pub mod types;
-
-mod validate;

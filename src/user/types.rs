@@ -1,10 +1,12 @@
 use serde::Deserialize;
 
+use crate::{auth::types::HashedPassword, domain::Username};
+
 #[derive(Clone, sqlx::FromRow)]
 pub struct User {
     pub id: i32,
-    pub username: String,
-    pub password: String,
+    pub username: Username,
+    pub password: HashedPassword,
 }
 
 #[derive(Deserialize)]

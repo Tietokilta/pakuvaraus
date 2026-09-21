@@ -1,17 +1,16 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
+use super::ParseError;
+use serde::Deserialize;
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, sqlx::Type)]
+#[sqlx(transparent)]
+#[serde(try_from = "String")]
 pub struct Email(String);
 
-pub enum EmailError {
-    Invalid,
-}
-
 impl Email {
-    pub fn parse(s: &str) -> Result<Self, EmailError> {
-        if validator::ValidateEmail::validate_email(&s) {
-            Ok(Self(s.to_string()))
-        } else {
-            Err(EmailError::Invalid)
-        }
+    pub fn parse(s: &str) -> Result<Self, ParseError> {
+        let email = s.trim().to_ascii_lowercase();
+        garde::rules::email::parse_email(&email).map_err(|_| ParseError::Email)?;
+        Ok(Self(email))
     }
 
     pub fn as_str(&self) -> &str {
@@ -19,8 +18,10 @@ impl Email {
     }
 }
 
-impl From<String> for Email {
-    fn from(s: String) -> Self {
-        Self(s)
+impl TryFrom<String> for Email {
+    type Error = ParseError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Self::parse(&value)
     }
 }
