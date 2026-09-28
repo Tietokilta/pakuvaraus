@@ -15,3 +15,11 @@ pub async fn send_reservation_email(service: &EmailService, to: &str) {
 
     service.sender.send(to, "Reservation received", &html).await.ok();
 }
+
+pub async fn send_approval_email(service: &EmailService, to: &str) {
+    let html = ReservationEmailTemplate {
+        name: to,
+    }.render().unwrap();
+
+    service.sender.send(to, "Reservation approved", &html).await.ok();
+}

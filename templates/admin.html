@@ -61,6 +61,7 @@
                 <th>Duration</th>
                 <th>Email</th>
                 <th>Guild</th>
+                <th>Overlaps</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -73,6 +74,13 @@
                 <td>{{ r.duration }}</td>
                 <td>{{ r.email }}</td>
                 <td>{{ r.internal }}</td>
+                <td>
+                  {% for o in r.overlaps %}
+                    <div>
+                      {{ o.id }} - ({{ o.duration }})
+                    </div>
+                  {% endfor %}
+                </td>
                 <td>
                   <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
                   <a href="/admin/reservations/{{ r.id }}/approve">approve</a>
@@ -97,6 +105,7 @@
                 <th>Duration</th>
                 <th>Email</th>
                 <th>Guild</th>
+                <th>Overlaps</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -109,6 +118,13 @@
                 <td>{{ r.duration }}</td>
                 <td>{{ r.email }}</td>
                 <td>{{ r.internal }}</td>
+                <td>
+                  {% for o in r.overlaps %}
+                    <div>
+                      {{ o.id }} - ({{ o.duration }})
+                    </div>
+                  {% endfor %}
+                </td>
                 <td>
                   <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
                 </td>

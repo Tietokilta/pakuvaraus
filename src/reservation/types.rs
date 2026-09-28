@@ -1,7 +1,11 @@
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 
+use std::ops::Deref;
+
 use crate::domain::email::Email;
+
+//Validated
 
 #[derive(sqlx::FromRow)]
 #[allow(clippy::struct_field_names,unused)]
@@ -14,6 +18,27 @@ pub struct Reservation {
     pub internal: bool,
     pub approved: bool,
 }
+
+//Sorted validated reservations
+
+pub struct SortedReservations(Box<[Reservation]>);
+
+impl SortedReservations {
+    pub fn new(mut v: Vec<Reservation>) -> Self {
+        v.sort_by_key(|r| r.start_time);
+        Self(v.into_boxed_slice())
+    }
+}
+
+impl Deref for SortedReservations {
+    type Target = [Reservation];
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+//Request
 
 #[derive(Deserialize)]
 pub struct CreateReservation {
@@ -39,6 +64,8 @@ impl From<Reservation> for ReservationItem {
     }
 }
 
+//Validation
+
 #[derive(Serialize, Deserialize)]
 pub struct ReservationValidation {
     pub is_valid: bool,
@@ -49,4 +76,12 @@ pub struct ReservationValidation {
 pub struct ValidationResult {
     pub valid: ReservationValidation,
     pub reservation: Option<Reservation>,
+}
+
+//Overlaps
+
+#[derive(Clone)]
+pub struct Overlap {
+    pub other_id: i32,
+    pub duration: chrono::Duration,
 }

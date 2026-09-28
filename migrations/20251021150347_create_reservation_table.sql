@@ -6,10 +6,12 @@ CREATE TABLE reservations (
     end_time TIMESTAMPTZ NOT NULL,
     internal BOOLEAN NOT NULL,
     approved BOOLEAN NOT NULL,
+    signed BOOLEAN NOT NULL,
     CONSTRAINT block_overlapping_times
     EXCLUDE USING gist (
-        tstzrange(start_time, end_time) WITH &&
+        tstzrange(start_time, end_time, '[)') WITH &&
     )
+    WHERE (internal = true)
 );
 
 CREATE TABLE users (
