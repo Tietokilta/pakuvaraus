@@ -84,7 +84,7 @@ pub struct ValidationResult {
 
 //Overlaps
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct Overlap {
     pub other_id: i32,
     pub duration: chrono::Duration,
