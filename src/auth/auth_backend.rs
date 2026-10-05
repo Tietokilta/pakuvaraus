@@ -7,6 +7,7 @@ use crate::error::AppError;
 use crate::user::{get_users_db::{get_user_by_id, get_user_by_name}, types::User};
 use crate::{error::AppResult, state::app_state::AppState};
 
+// Required by AuthUser
 impl std::fmt::Debug for User {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("User")
@@ -38,7 +39,9 @@ impl AuthnBackend for AppState {
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        let user = get_user_by_name(&self.db.pool, &creds.username.as_str()).await?;
+        let username = &creds.username;
+        info!("Authenticate crendentials for {username}");
+        let user = get_user_by_name(&self.db.pool, username.as_str()).await?;
 
         let Some(user) = user else {
             return Ok(None);

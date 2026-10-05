@@ -1,5 +1,3 @@
-use dotenv::dotenv;
-
 use crate::db::service::DbService;
 use crate::email::service::EmailService;
 
@@ -10,8 +8,6 @@ pub struct AppState {
 }
 
 pub async fn new() -> AppState {
-    dotenv().ok();
-
     AppState {
         db: DbService::create().await,
         email: EmailService::create(),
