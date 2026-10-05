@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
@@ -7,16 +8,17 @@ use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::{MessagesManagerLayer};
 use tracing::info;
 
-mod error;
-mod pdfgen;
 mod admin;
 mod api;
 mod auth;
 mod db;
 mod domain;
 mod email;
+mod error;
+mod logging;
 mod login;
 mod mailgun;
+mod pdfgen;
 mod reservation;
 mod state;
 mod user;
@@ -24,7 +26,8 @@ mod util;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    dotenv().ok();
+    logging::tracing_filter::init();
 
     let test_password = "pass123";
     let test_plain = auth::types::PlainPassword(test_password.to_string());
