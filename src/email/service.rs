@@ -2,30 +2,31 @@ use async_trait::async_trait;
 use std::sync::Arc;
 
 use super::{config::EmailConfig, test::StubService};
-use crate::{email::EmailError, mailgun::service::MailgunService};
+use crate::{email::{EmailError, attachment::Attachment}, mailgun::service::MailgunService};
 
 #[async_trait]
 pub trait EmailSender: Send + Sync {
-    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), EmailError>;
+    async fn send(&self, to: String, subject: String, html: String, attachments: Box<[Attachment<'_>]>) -> Result<(), EmailError>;
 }
 
 #[derive(Clone)]
 pub struct EmailService {
     pub sender: Arc<dyn EmailSender>,
+    pub config: EmailConfig,
 }
 
 impl EmailService {
-    pub fn from_config(config: &EmailConfig) -> Self {
+    pub fn from_config(config: EmailConfig) -> Self {
         let sender: Arc<dyn EmailSender> = if config.enabled {
             Arc::new(MailgunService::create())
         } else {
             Arc::new(StubService::create())
         };
 
-        Self { sender: sender }
+        Self { sender: sender, config,}
     }
 
     pub fn create() -> Self {
-        Self::from_config(&EmailConfig::from_env())
+        Self::from_config(EmailConfig::from_env())
     }
 }

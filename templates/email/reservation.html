@@ -1,2 +1,9 @@
-<h1>Reservation received</h1>
-<p>name: {{ name }}.</p>
+<h1>Reservation request received</h1>
+<p>
+  name: {{ name }}
+  email: {{ email }}
+  phone number: {{ phone_number }}
+  start time: {{ timerange.start() }}
+  end time: {{ timerange.end() }}
+  used outside Finland: {{ used_outside_finland }}
+</p>
