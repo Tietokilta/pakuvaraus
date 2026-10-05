@@ -8,7 +8,7 @@ use typst::text::{Font, FontBook};
 use typst::utils::LazyHash;
 use typst::{Library, LibraryExt, World};
 
-static TEMPLATE: &str = include_str!("../../templates/contract.typ");
+static TEMPLATE: &str = include_str!("../../templates/pdf/contract.typ");
 
 #[derive(Debug, Clone)]
 pub struct TypstWorld {
