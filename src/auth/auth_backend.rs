@@ -4,7 +4,7 @@ use tracing::info;
 use super::{password::check_plain_password, types::Credentials};
 use crate::auth::password::CheckPasswordError;
 use crate::error::AppError;
-use crate::user::{get_users_db::get_one_user, types::User};
+use crate::user::{get_users_db::{get_user_by_id, get_user_by_name}, types::User};
 use crate::{error::AppResult, state::app_state::AppState};
 
 impl std::fmt::Debug for User {
@@ -38,22 +38,17 @@ impl AuthnBackend for AppState {
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        let user = sqlx::query_as!(
-            Self::User,
-            r#"SELECT id, username AS "username: _", password AS "password: _" FROM users WHERE username = $1"#,
-            creds.username.as_str()
-        ).fetch_optional(&self.db.pool)
-         .await?;
+        let user = get_user_by_name(&self.db.pool, &creds.username.as_str()).await?;
 
         let Some(user) = user else {
             return Ok(None);
         };
 
-        let result = check_plain_password(creds.password, user.password.clone())
+        let password_valid = check_plain_password(creds.password, user.password.clone())
             .await
             .map(|()| user);
 
-        match result {
+        match password_valid {
             Ok(user) => Ok(Some(user)),
             Err(CheckPasswordError::WrongPassword) => Ok(None),
             Err(
@@ -64,6 +59,6 @@ impl AuthnBackend for AppState {
 
     async fn get_user(&self, user_id: &UserId<Self>) -> AppResult<Option<Self::User>> {
         info!("Get user, id: {user_id}");
-        Ok(get_one_user(&self.db.pool, *user_id).await?)
+        Ok(get_user_by_id(&self.db.pool, *user_id).await?)
     }
 }
