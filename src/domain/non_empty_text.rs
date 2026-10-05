@@ -20,9 +20,9 @@ impl<const N: usize> NonEmptyText<N> {
     }
 }
 
-impl<const N: usize> Into<String> for NonEmptyText<N> {
-    fn into(self) -> String {
-        self.0
+impl<const N: usize> From<NonEmptyText<N>> for String {
+    fn from(value: NonEmptyText<N>) -> Self {
+        value.0
     }
 }
 

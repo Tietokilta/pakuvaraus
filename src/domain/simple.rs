@@ -31,9 +31,9 @@ macro_rules! nonemptytext_newtype {
                 }
             }
 
-            impl Into<String> for $name {
-                fn into(self) -> String {
-                    self.0.into()
+            impl From<$name> for String {
+                fn from(value: $name) -> String {
+                    value.0.into()
                 }
             }
 
