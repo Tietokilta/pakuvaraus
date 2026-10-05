@@ -1,29 +1,23 @@
 use sqlx::PgPool;
 use tracing::info;
 
-use super::types::User;
 use crate::auth::types::HashedPassword;
+use crate::db::{DbError, ResultExt};
 use crate::domain::Username;
 
 pub async fn add_user(
     db_pool: &PgPool,
     username: &Username,
     password: HashedPassword
-) {
-    info!("Try to create new user: {}", username.as_str());
-    let res = sqlx::query_as!(
-        User,
-        r#"INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username AS "username: _", password AS "password: _""#,
+) -> Result<(), DbError> {
+    info!("Try to create new user: {username}");
+    sqlx::query!(
+        r#"INSERT INTO users (username, password) VALUES ($1, $2)"#,
         username.as_str(),
         password.as_str()
     )
-    .fetch_one(db_pool)
-    .await;
-
-    match res {
-        Ok(_) => (),
-        Err(err) => {
-            info!("Create user failed, database error: {}", err.to_string());
-        }
-    }
+    .execute(db_pool)
+    .await
+    .on_constraint("users_username_key", |_| DbError::Constraint("username already taken"))
+    .map(|_| ())
 }

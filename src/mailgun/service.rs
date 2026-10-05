@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use reqwest::{Client, multipart::Form};
 
 use super::config::MailgunConfig;
-use crate::email::service::EmailSender;
+use crate::email::{EmailError, service::EmailSender};
 
 #[derive(Clone)]
 pub struct MailgunService {
@@ -31,7 +31,7 @@ impl MailgunService {
 
 #[async_trait]
 impl EmailSender for MailgunService {
-    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), String> {
+    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), EmailError> {
         let form = Form::new()
             .text("from", self.from.clone())
             .text("to", to.to_string())
@@ -44,13 +44,13 @@ impl EmailSender for MailgunService {
             .basic_auth(self.api_user.clone(), Some(self.api_key.clone()))
             .multipart(form)
             .send()
-            .await
-            .map_err(|e| e.to_string())?;
+            .await?;
 
-        if !res.status().is_success() {
-            return Err(format!("Error: {}", res.status()));
+        let status = res.status();
+        if !status.is_success() {
+            let body = res.text().await?;
+            return Err(EmailError::Rejected { status, body });
         }
-
         Ok(())
     }
 }

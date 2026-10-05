@@ -1,10 +1,10 @@
 use askama::Template;
 use axum::{
     extract::{Form},
-    response::{Html, IntoResponse, Redirect},
+    response::{Html, Redirect},
 };
 
-use crate::auth::types::RegisterUserRequest;
+use crate::{auth::types::RegisterUserRequest, error::AppResult};
 use crate::auth::auth_session::AuthenticatedSession;
 
 #[derive(Template)]
@@ -12,22 +12,15 @@ use crate::auth::auth_session::AuthenticatedSession;
 struct NewAdminTemplate {
 }
 
-pub async fn get_new_admin_page(_auth_session: AuthenticatedSession) -> impl IntoResponse {
-    Html(
-        NewAdminTemplate {
-
-        }
-        .render()
-        .unwrap(),
-        )
-    .into_response()
+pub async fn get_new_admin_page(_auth_session: AuthenticatedSession) -> AppResult<Html<String>> {
+    Ok(Html(NewAdminTemplate {}.render()?))
 }
 
-pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<RegisterUserRequest>) -> impl IntoResponse {
+pub async fn new_admin(auth_session: AuthenticatedSession, Form(payload): Form<RegisterUserRequest>) -> AppResult<Redirect> {
     crate::auth::register_user::register_user(
-        &auth_session.backend.db.pool,
+        &auth_session.session.backend.db.pool,
         &payload.username,
-        &payload.password,
-    ).await;
-    Redirect::to("/admin").into_response()
+        payload.password,
+    ).await?;
+    Ok(Redirect::to("/admin"))
 }

@@ -20,12 +20,17 @@ impl<const N: usize> NonEmptyText<N> {
     }
 }
 
+impl<const N: usize> Into<String> for NonEmptyText<N> {
+    fn into(self) -> String {
+        self.0
+    }
+}
+
 impl<const N: usize> std::fmt::Display for NonEmptyText<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
-
 impl<const N: usize> TryFrom<String> for NonEmptyText<N> {
     type Error = ParseError;
 

@@ -1,14 +1,16 @@
 use axum::{
     extract::{Path},
-    response::{IntoResponse, Redirect},
+    response::Redirect,
 };
 
-use crate::auth::auth_session::AuthenticatedSession;
+use crate::{auth::auth_session::AuthenticatedSession, error::{AppError, AppResult}};
 
-pub async fn remove_reservation(auth_session: AuthenticatedSession, Path(id): Path<i32>) -> impl IntoResponse {
+pub async fn remove_reservation(auth_session: AuthenticatedSession, Path(id): Path<i32>) -> AppResult<Redirect> {
     crate::reservation::remove_reservation_db::remove_reservation(
-        &auth_session.backend.db.pool,
+        &auth_session.session.backend.db.pool,
         id,
-    ).await;
-    Redirect::to("/admin").into_response()
+    ).await?
+     .ok_or(AppError::NotFound)?;
+
+    Ok(Redirect::to("/admin"))
 }

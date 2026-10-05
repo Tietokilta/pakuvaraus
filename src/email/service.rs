@@ -2,16 +2,16 @@ use async_trait::async_trait;
 use std::sync::Arc;
 
 use super::{config::EmailConfig, test::StubService};
-use crate::mailgun::service::MailgunService;
+use crate::{email::EmailError, mailgun::service::MailgunService};
 
 #[async_trait]
 pub trait EmailSender: Send + Sync {
-    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), String>;
+    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), EmailError>;
 }
 
 #[derive(Clone)]
 pub struct EmailService {
-    pub sender: Arc<dyn EmailSender>
+    pub sender: Arc<dyn EmailSender>,
 }
 
 impl EmailService {
@@ -22,9 +22,7 @@ impl EmailService {
             Arc::new(StubService::create())
         };
 
-        Self {
-            sender: sender
-        }
+        Self { sender: sender }
     }
 
     pub fn create() -> Self {

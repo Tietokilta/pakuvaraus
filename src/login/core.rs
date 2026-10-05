@@ -1,56 +1,49 @@
+
+use anyhow::Context;
 use askama::Template;
 use axum::{
-    response::{Html, IntoResponse, Redirect},
     extract::Form,
-    http::StatusCode,
+    response::{Html, Redirect},
 };
 use axum_login::AuthSession;
 use axum_messages::Messages;
 use tracing::info;
 
-use crate::state::app_state::AppState;
 use crate::auth::types::Credentials;
+use crate::{
+    error::{
+        AppError::InvalidCredentials,
+        AppResult,
+    },
+    state::app_state::AppState,
+};
 
 #[derive(Template)]
 #[template(path = "login.html")]
-struct LoginTemplate {
+struct LoginTemplate {}
 
-}
-
-pub async fn get_login_page() -> impl IntoResponse {
-    Html(
-        LoginTemplate {
-
-        }
-        .render()
-        .unwrap(),
-        )
-    .into_response()
+pub async fn get_login_page() -> AppResult<Html<String>> {
+    Ok(Html(LoginTemplate {}.render()?))
 }
 
 pub async fn login(
     mut auth_session: AuthSession<AppState>,
     messages: Messages,
     Form(creds): Form<Credentials>,
-) -> impl IntoResponse {
+) -> AppResult<Redirect> {
     info!("Try to log in");
-    let user = match auth_session.authenticate(creds.clone()).await {
-        Ok(Some(user)) => user,
-        Ok(None) => {
-            messages.error("Invalid credentials");
+    let user = auth_session
+        .authenticate(creds.clone())
+        .await
+        .with_context(|| format!("panic while authenticating {}", creds.username))?
+        .ok_or(InvalidCredentials)?;
 
-            return Redirect::to("/login").into_response();
-        }
-        Err(e) => {
-            info!("Error: {e}");
-            return StatusCode::INTERNAL_SERVER_ERROR.into_response()
-        }
-    };
+    auth_session
+        .login(&user)
+        .await
+        .with_context(|| format!("login failed for {}", creds.username))?;
 
-    if auth_session.login(&user).await.is_err() {
-        return StatusCode::INTERNAL_SERVER_ERROR.into_response();
-    }
     messages.success(format!("Successfully logged in as {}", user.username));
 
-    Redirect::to("/admin").into_response()
+    Ok(Redirect::to("/admin"))
 }

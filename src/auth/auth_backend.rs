@@ -1,13 +1,11 @@
 use axum_login::{AuthUser, AuthnBackend, UserId};
-use tokio::task;
 use tracing::info;
 
-use super::{
-    password::check_plain_password,
-    types::Credentials,
-};
-use crate::state::app_state::AppState;
+use super::{password::check_plain_password, types::Credentials};
+use crate::auth::password::CheckPasswordError;
+use crate::error::AppError;
 use crate::user::types::User;
+use crate::{error::AppResult, state::app_state::AppState};
 
 impl std::fmt::Debug for User {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -31,19 +29,10 @@ impl AuthUser for User {
     }
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error(transparent)]
-    Sqlx(#[from] sqlx::Error),
-
-    #[error(transparent)]
-    TaskJoin(#[from] task::JoinError),
-}
-
 impl AuthnBackend for AppState {
     type User = User;
     type Credentials = Credentials;
-    type Error = Error;
+    type Error = AppError;
 
     async fn authenticate(
         &self,
@@ -56,12 +45,24 @@ impl AuthnBackend for AppState {
         ).fetch_optional(&self.db.pool)
          .await?;
 
-        task::spawn_blocking(move || {
-            Ok(user.filter(|user| check_plain_password(creds.password, &user.password)))
-        }).await?
+        let Some(user) = user else {
+            return Ok(None);
+        };
+
+        let result = check_plain_password(creds.password, user.password.clone())
+            .await
+            .map(|()| user);
+
+        match result {
+            Ok(user) => Ok(Some(user)),
+            Err(CheckPasswordError::WrongPassword) => Ok(None),
+            Err(
+                err @ (CheckPasswordError::MalformedHash(_) | CheckPasswordError::TokioError(_)),
+            ) => Err(anyhow::Error::from(err).into()),
+        }
     }
 
-    async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
+    async fn get_user(&self, user_id: &UserId<Self>) -> AppResult<Option<Self::User>> {
         info!("Get user");
         let user = sqlx::query_as("select * from users where id = $1")
             .bind(user_id)
