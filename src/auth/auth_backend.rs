@@ -4,7 +4,7 @@ use tracing::info;
 use super::{password::check_plain_password, types::Credentials};
 use crate::auth::password::CheckPasswordError;
 use crate::error::AppError;
-use crate::user::types::User;
+use crate::user::{get_users_db::get_one_user, types::User};
 use crate::{error::AppResult, state::app_state::AppState};
 
 impl std::fmt::Debug for User {
@@ -63,12 +63,7 @@ impl AuthnBackend for AppState {
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> AppResult<Option<Self::User>> {
-        info!("Get user");
-        let user = sqlx::query_as("select * from users where id = $1")
-            .bind(user_id)
-            .fetch_optional(&self.db.pool)
-            .await?;
-
-        Ok(user)
+        info!("Get user, id: {user_id}");
+        Ok(get_one_user(&self.db.pool, *user_id).await?)
     }
 }

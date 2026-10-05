@@ -4,7 +4,7 @@ pub fn find_overlaps(res: &SortedReservations) -> Vec<(usize, usize)> {
     let mut overlaps = Vec::new();
 
     for (i, res_a) in res.iter().enumerate() {
-        for (j, res_b) in res.iter().skip(i).enumerate() {
+        for (j, res_b) in res.iter().enumerate().skip(i + 1) {
             if res_b.start_time >= res_a.end_time {
                 break;
             }
