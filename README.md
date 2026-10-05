@@ -15,11 +15,15 @@ set up the database, install sqlx-cli to run the commands
 add and get reservations in powershell:
 ```powershell
 $body = @{
-    reservation_name = "Test name 1"
+    full_name = "Test name 1"
+    address = "Konemiehentie 2"
     email = "test@example.com"
+    phone_number = "040 1234567"
+    hetu = "010100+002H"
     start_time = "2025-10-20T10:00:00.000000Z"
     end_time = "2025-10-20T12:00:00.000000Z"
     internal = $true
+    used_outside_finland = $false
 }
 
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Post -ContentType "application/json" -Body ($body | ConvertTo-Json)
@@ -30,8 +34,19 @@ or in a posix shell with `curl`
 ```sh
 curl 'http://127.0.0.1:3000/reservations' \
     -H 'Content-Type: application/json' \
-    -d '{"reservation_name": "Test name 1", "email": "test@example.com", "start_time": "2025-10-20T10:00:00.000000Z", "end_time": "2025-10-20T10:00:00.000000Z"}'
+    -d '{
+        "full_name": "Test name 1",
+        "address": "Konemiehentie 2",
+        "email": "test@example.com",
+        "phone_number": "040 1234567",
+        "hetu": "010100+002H",
+        "start_time": "2025-10-20T10:00:00.000000Z",
+        "end_time": "2025-10-20T12:00:00.000000Z",
+        "internal": true,
+        "used_outside_finland": false
+    }'
 ```
+Invalid input is rejected with `422 Unprocessable Entity` and a plain-text message naming the problem.
 ```sh
 curl 'http://127.0.0.1:3000/reservations'
 ```

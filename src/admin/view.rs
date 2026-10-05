@@ -1,4 +1,5 @@
-use chrono::{DateTime, Duration, Utc};
+use chrono::Utc;
+use chrono::DateTime;
 
 use crate::reservation::types::{Reservation, Overlap};
 
@@ -52,7 +53,7 @@ impl UserView {
 
 impl OverlapView {
     pub fn from_domain(o: &Overlap) -> Self {
-        Self { 
+        Self {
             id: o.other_id,
             duration: format_duration(o.duration),
         }
@@ -60,7 +61,7 @@ impl OverlapView {
 }
 
 impl ReservationView {
-    pub fn from_domain(r: &Reservation, overlaps: &Vec<Overlap>) -> Self {
+    pub fn from_domain(r: &Reservation, overlaps: &[Overlap]) -> Self {
         let duration = r.end_time - r.start_time;
 
         Self {
@@ -71,7 +72,7 @@ impl ReservationView {
             email: r.email.as_str().to_string(),
             internal: r.internal,
             approved: r.approved,
-            overlaps: overlaps.iter().map(|o| OverlapView::from_domain(o)).collect(),
+            overlaps: overlaps.iter().map(OverlapView::from_domain).collect(),
         }
     }
 }

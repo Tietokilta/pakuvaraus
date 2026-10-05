@@ -4,7 +4,7 @@ use axum::{
     response::{Html, IntoResponse, Redirect},
 };
 
-use crate::auth::types::{ChangePasswordRequest, PlainPassword, PasswordHash};
+use crate::auth::types::ChangePasswordRequest;
 use crate::auth::auth_session::AuthenticatedSession;
 
 use tracing::info;
@@ -33,10 +33,9 @@ pub async fn change_password(auth_session: AuthenticatedSession, Form(payload): 
             crate::auth::change_password::change_password(
                 &auth_session.backend.db.pool,
                 user.id,
-                PasswordHash(user.password.clone()),
-                PlainPassword(payload.old_password),
-                PlainPassword(payload.password),
-                PlainPassword(payload.password_again)
+                user.password.clone(),
+                payload.old_password,
+                &payload.new_password,
             ).await;
             Redirect::to("/admin").into_response()
         },

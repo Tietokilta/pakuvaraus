@@ -1,12 +1,13 @@
 CREATE TABLE reservations (
     id SERIAL PRIMARY KEY,
-    reservation_name TEXT NOT NULL,
+    full_name TEXT NOT NULL,
     email TEXT NOT NULL,
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
     internal BOOLEAN NOT NULL,
     approved BOOLEAN NOT NULL,
     signed BOOLEAN NOT NULL,
+    CONSTRAINT start_before_end CHECK (start_time < end_time),
     CONSTRAINT block_overlapping_times
     EXCLUDE USING gist (
         tstzrange(start_time, end_time, '[)') WITH &&

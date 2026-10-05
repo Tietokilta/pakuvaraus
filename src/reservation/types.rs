@@ -2,8 +2,7 @@ use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 
 use std::ops::Deref;
-
-use crate::domain::email::Email;
+use crate::domain::{Address, Email, FullName, Hetu, Phone, TimeRange};
 
 //Validated
 
@@ -11,7 +10,7 @@ use crate::domain::email::Email;
 #[allow(clippy::struct_field_names,unused)]
 pub struct Reservation {
     pub id: i32,
-    pub reservation_name: String,
+    pub full_name: FullName,
     pub email: Email,
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,
@@ -40,13 +39,18 @@ impl Deref for SortedReservations {
 
 //Request
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct CreateReservation {
-    pub reservation_name: String,
-    pub email: String,
-    pub start_time: DateTime<Utc>,
-    pub end_time: DateTime<Utc>,
+    pub full_name: FullName,
+    pub address: Address,
+    pub email: Email,
+    pub phone_number: Phone,
+    pub hetu: Hetu,
+    // `start_time` and `end_time` in the JSON
+    #[serde(flatten)]
+    pub time: TimeRange,
     pub internal: bool,
+    pub used_outside_finland: bool,
 }
 
 #[derive(Serialize)]
@@ -80,7 +84,7 @@ pub struct ValidationResult {
 
 //Overlaps
 
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub struct Overlap {
     pub other_id: i32,
     pub duration: chrono::Duration,
