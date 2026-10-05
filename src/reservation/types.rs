@@ -68,20 +68,6 @@ impl From<Reservation> for ReservationItem {
     }
 }
 
-//Validation
-
-#[derive(Serialize, Deserialize)]
-pub struct ReservationValidation {
-    pub is_valid: bool,
-    pub reason: String,
-}
-
-#[allow(unused)]
-pub struct ValidationResult {
-    pub valid: ReservationValidation,
-    pub reservation: Option<Reservation>,
-}
-
 //Overlaps
 
 #[derive(Copy, Clone)]
