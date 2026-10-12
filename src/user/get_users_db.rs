@@ -12,8 +12,10 @@ pub async fn get_users(db_pool: &PgPool) -> Result<Vec<UserDataObject>, DbError>
 }
 
 pub async fn get_user_by_id(db_pool: &PgPool, user_id: i32) -> Result<Option<User>, DbError> {
-    let user = sqlx::query_as("select * from users where id = $1")
-        .bind(user_id)
+    let user = sqlx::query_as!(User, 
+        r#"
+        SELECT id, username AS "username: _", password AS "password: _" FROM users WHERE id = $1
+        "#, user_id)
         .fetch_optional(db_pool)
         .await?;
 
@@ -21,8 +23,10 @@ pub async fn get_user_by_id(db_pool: &PgPool, user_id: i32) -> Result<Option<Use
 }
 
 pub async fn get_user_by_name(db_pool: &PgPool, username: &str) -> Result<Option<User>, DbError> {
-    let user = sqlx::query_as("select * from users where username = $1")
-        .bind(username)
+    let user = sqlx::query_as!(User, 
+        r#"
+        SELECT id, username AS "username: _", password AS "password: _" FROM users WHERE username = $1
+        "#, username)
         .fetch_optional(db_pool)
         .await?;
 
