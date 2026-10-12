@@ -1,8 +1,11 @@
 use async_trait::async_trait;
-use reqwest::{Client, multipart::Form};
+use reqwest::{
+    Client,
+    multipart::{Form, Part},
+};
 
 use super::config::MailgunConfig;
-use crate::email::{EmailError, service::EmailSender};
+use crate::email::{EmailError, attachment::Attachment, service::EmailSender};
 
 #[derive(Clone)]
 pub struct MailgunService {
@@ -31,17 +34,32 @@ impl MailgunService {
 
 #[async_trait]
 impl EmailSender for MailgunService {
-    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), EmailError> {
-        let form = Form::new()
+    async fn send(
+        &self,
+        to: String,
+        subject: String,
+        html: String,
+        attachments: Box<[Attachment<'_>]>,
+    ) -> Result<(), EmailError> {
+        let mut form = Form::new()
             .text("from", self.from.clone())
-            .text("to", to.to_string())
-            .text("subject", subject.to_string())
-            .text("html", html.to_string());
+            .text("to", to)
+            .text("subject", subject)
+            .text("html", html);
+
+        for att in attachments {
+            form = form.part(
+                "attachment",
+                Part::bytes(att.data)
+                    .file_name(att.filename)
+                    .mime_str(att.content_type)?,
+            );
+        }
 
         let res = self
             .client
-            .post(self.url.clone())
-            .basic_auth(self.api_user.clone(), Some(self.api_key.clone()))
+            .post(&self.url)
+            .basic_auth(&self.api_user, Some(&self.api_key))
             .multipart(form)
             .send()
             .await?;

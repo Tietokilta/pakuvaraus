@@ -1,0 +1,10 @@
+<h1> New Tietokilta van reservation request </h1>
+<p>
+  New reservation request:
+  name: {{ reservation.name }}
+  email: {{ reservation.email }}
+  phone number: {{ reservation.phone_number }}
+  start time: {{ reservation.timerange.start() }}
+  end time: {{ reservation.timerange.end() }}
+  used outside Finland: {{ reservation.used_outside_finland }}
+<p>

@@ -1,25 +1,32 @@
 use async_trait::async_trait;
 use tracing::info;
 
-use crate::email::EmailError;
+use crate::email::{EmailError, attachment::Attachment};
 
 use super::service::EmailSender;
 
 #[derive(Clone)]
-pub struct StubService {
-
-}
+pub struct StubService {}
 
 impl StubService {
     pub const fn create() -> Self {
-        Self { }
+        Self {}
     }
 }
 
 #[async_trait]
 impl EmailSender for StubService {
-    async fn send(&self, to: &str, subject: &str, html: &str) -> Result<(), EmailError> {
-        info!("Send email to: {}, subject: {}, html: {}", to, subject, html);
+    async fn send(
+        &self,
+        to: String,
+        subject: String,
+        html: String,
+        attachments: Box<[Attachment<'_>]>,
+    ) -> Result<(), EmailError> {
+        info!(
+            "Send email to: {to}, subject: {subject}, {} attachments, html: {html}",
+            attachments.len()
+        );
         Ok(())
     }
 }

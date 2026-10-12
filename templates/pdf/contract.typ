@@ -12,6 +12,7 @@
 #let hetu = inputs.at("hetu")
 #let used_outside_finland = inputs.at("used_outside_finland")
 #let start_time = inputs.at("start_time")
+#let end_time = inputs.at("end_time")
 
 #align(center)[
   #text(size: 18pt, weight: "bold")[Tietokilta ry:n pakettiauton luovutussopimus]\
@@ -107,5 +108,6 @@ Lainaajan tiedot:
   ("Puhelinnumero:", phone_number),
   ("Sähköposti:", email),
   ("Henkilötunnus:", hetu),
-  ("Aloitusaika:", start_time)
+  ("Alkuaika:", start_time),
+  ("Loppuaika:", end_time)
 )

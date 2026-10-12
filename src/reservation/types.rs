@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 
 use std::ops::Deref;
-use crate::domain::{Address, Email, FullName, Hetu, Phone, TimeRange};
+use crate::{domain::{Address, Email, FullName, Hetu, Phone, TimeRange}, email::email_templates::ReservationEmail};
+
 
 //Validated
 
@@ -39,7 +40,7 @@ impl Deref for SortedReservations {
 
 //Request
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct CreateReservation {
     pub full_name: FullName,
     pub address: Address,
@@ -51,6 +52,18 @@ pub struct CreateReservation {
     pub time: TimeRange,
     pub internal: bool,
     pub used_outside_finland: bool,
+}
+
+impl<'a> From<&'a CreateReservation> for ReservationEmail<'a> {
+    fn from(value: &'a CreateReservation) -> Self {
+        Self {
+            email: &value.email,
+            name: &value.full_name,
+            phone_number: &value.phone_number,
+            timerange: &value.time,
+            used_outside_finland: value.used_outside_finland,
+        }
+    }
 }
 
 #[derive(Serialize)]
