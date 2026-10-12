@@ -1,16 +1,16 @@
-mod phone;
-mod hetu;
 mod email;
+mod hetu;
 mod non_empty_text;
-mod time_range;
+mod phone;
 mod simple;
+mod time_range;
 
-pub use phone::*;
-pub use hetu::*;
 pub use email::*;
+pub use hetu::*;
 pub use non_empty_text::*;
-pub use time_range::*;
+pub use phone::*;
 pub use simple::*;
+pub use time_range::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ParseError {

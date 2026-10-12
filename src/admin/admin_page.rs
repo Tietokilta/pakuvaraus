@@ -51,7 +51,7 @@ pub async fn admin_page(auth_session: AuthenticatedSession) -> AppResult<Html<St
                 .collect(),
             username: user.username.as_str(),
         }
-        .render()?
+        .render()?,
     ))
 }
 

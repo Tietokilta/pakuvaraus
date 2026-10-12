@@ -1,13 +1,13 @@
-use axum::{
-    routing::{get, post},
-    Router,
-};
-use crate::state::app_state::AppState;
 use super::admin_page::{admin_page, approve_reservation};
-use super::change_password::{get_change_password_page, change_password};
+use super::change_password::{change_password, get_change_password_page};
 use super::new_admin::{get_new_admin_page, new_admin};
 use super::remove_admin::remove_admin;
 use super::remove_reservation::remove_reservation;
+use crate::state::app_state::AppState;
+use axum::{
+    Router,
+    routing::{get, post},
+};
 
 pub fn router() -> Router<AppState> {
     Router::new()

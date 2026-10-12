@@ -1,9 +1,9 @@
-use axum::{
-    routing::{get, post},
-    Router,
-};
 use super::core::{get_login_page, login};
 use super::logout::logout;
+use axum::{
+    Router,
+    routing::{get, post},
+};
 
 pub fn router() -> Router<()> {
     Router::new()

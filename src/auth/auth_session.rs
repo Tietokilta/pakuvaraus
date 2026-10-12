@@ -35,7 +35,7 @@ where
         info!("Validate user");
         if let Some(user) = session.user.clone() {
             info!("Validated");
-            return Ok(Self { session, user, });
+            return Ok(Self { session, user });
         }
         info!("Validation failed");
         Err(LoginRedirect.into_response())

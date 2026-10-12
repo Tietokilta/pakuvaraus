@@ -1,6 +1,6 @@
 #![allow(unused)]
+mod fonts;
 mod generate;
 mod typstworld;
-mod fonts;
 
 pub use generate::*;

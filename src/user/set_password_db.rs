@@ -1,7 +1,10 @@
 use sqlx::PgPool;
 use tracing::debug;
 
-use crate::{auth::types::HashedPassword, db::{DbError, UpdateOutcome}};
+use crate::{
+    auth::types::HashedPassword,
+    db::{DbError, UpdateOutcome},
+};
 
 pub async fn set_password(
     db_pool: &PgPool,

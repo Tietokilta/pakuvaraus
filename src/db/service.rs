@@ -13,9 +13,7 @@ impl DbService {
             .await
             .expect("DB pool create failed");
 
-        Self {
-            pool: db_pool,
-        }
+        Self { pool: db_pool }
     }
 
     pub async fn create() -> Self {

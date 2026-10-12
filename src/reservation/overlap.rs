@@ -1,4 +1,4 @@
-use super::types::{Reservation, SortedReservations, Overlap};
+use super::types::{Overlap, Reservation, SortedReservations};
 
 pub fn find_overlaps(res: &SortedReservations) -> Vec<(usize, usize)> {
     let mut overlaps = Vec::new();
@@ -19,17 +19,21 @@ pub fn find_overlaps(res: &SortedReservations) -> Vec<(usize, usize)> {
 }
 
 #[allow(clippy::indexing_slicing)]
-pub fn distribute_overlaps(res: &[Reservation], overlaps: Vec<(usize, usize)>) -> Vec<Vec<Overlap>> {
+pub fn distribute_overlaps(
+    res: &[Reservation],
+    overlaps: Vec<(usize, usize)>,
+) -> Vec<Vec<Overlap>> {
     let mut result = vec![Vec::new(); res.len()];
     for (a, b) in overlaps {
-        let duration = res[a].end_time.min(res[b].end_time) - res[a].start_time.max(res[b].start_time);
-        result[a].push(Overlap{
-            other_id: res[b].id, 
-            duration: duration
+        let duration =
+            res[a].end_time.min(res[b].end_time) - res[a].start_time.max(res[b].start_time);
+        result[a].push(Overlap {
+            other_id: res[b].id,
+            duration: duration,
         });
-        result[b].push(Overlap{
-            other_id: res[a].id, 
-            duration: duration
+        result[b].push(Overlap {
+            other_id: res[a].id,
+            duration: duration,
         });
     }
 

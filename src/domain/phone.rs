@@ -1,7 +1,7 @@
-use std::fmt;
+use super::ParseError;
 use phonenumber::{Mode, PhoneNumber};
 use serde::Deserialize;
-use super::ParseError;
+use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(try_from = "String")]
@@ -9,8 +9,8 @@ pub struct Phone(PhoneNumber);
 impl Phone {
     pub fn parse(s: &str) -> Result<Self, ParseError> {
         // If no country code given, assume Finnish
-        let n = phonenumber::parse(Some(phonenumber::country::FI), s)
-            .map_err(|_| ParseError::Phone)?;
+        let n =
+            phonenumber::parse(Some(phonenumber::country::FI), s).map_err(|_| ParseError::Phone)?;
         if !n.is_valid() {
             return Err(ParseError::Phone);
         }
@@ -31,4 +31,3 @@ impl fmt::Display for Phone {
         write!(f, "{}", self.0.format().mode(Mode::International))
     }
 }
-
