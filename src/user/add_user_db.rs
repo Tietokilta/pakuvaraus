@@ -8,7 +8,7 @@ use crate::domain::Username;
 pub async fn add_user(
     db_pool: &PgPool,
     username: &Username,
-    password: HashedPassword
+    password: HashedPassword,
 ) -> Result<(), DbError> {
     info!("Try to create new user: {username}");
     sqlx::query!(
@@ -18,6 +18,8 @@ pub async fn add_user(
     )
     .execute(db_pool)
     .await
-    .on_constraint("users_username_key", |_| DbError::Constraint("username already taken"))
+    .on_constraint("users_username_key", |_| {
+        DbError::Constraint("username already taken")
+    })
     .map(|_| ())
 }

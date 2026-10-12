@@ -1,6 +1,6 @@
-pub mod service;
-pub mod email_templates;
 pub mod attachment;
+pub mod email_templates;
+pub mod service;
 
 mod config;
 mod test;

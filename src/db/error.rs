@@ -5,7 +5,7 @@ pub enum DbError {
     #[error("constraint violation: {0}")]
     Constraint(&'static str),
     #[error(transparent)]
-    Sqlx(#[from] sqlx::Error)
+    Sqlx(#[from] sqlx::Error),
 }
 
 // taken from github:launchbadge/realworld-axum-sqlx
@@ -47,4 +47,3 @@ where
         })
     }
 }
-

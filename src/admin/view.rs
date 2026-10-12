@@ -1,7 +1,7 @@
-use chrono::Utc;
 use chrono::DateTime;
+use chrono::Utc;
 
-use crate::reservation::types::{Reservation, Overlap};
+use crate::reservation::types::{Overlap, Reservation};
 
 //Helper
 

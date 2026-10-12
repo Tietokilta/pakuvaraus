@@ -14,4 +14,3 @@ pub struct UserDataObject {
     pub id: i32,
     pub username: String,
 }
-

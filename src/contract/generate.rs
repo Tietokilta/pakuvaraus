@@ -35,17 +35,25 @@ impl From<CreateReservation> for ContractInputs {
     }
 }
 
-
 impl From<ContractInputs> for Dict {
     fn from(info: ContractInputs) -> Self {
         let mut d = Self::new();
         d.insert("full_name".into(), info.full_name.as_str().into_value());
         d.insert("address".into(), info.address.as_str().into_value());
-        d.insert("phone_number".into(), info.phone_number.to_string().into_value());
+        d.insert(
+            "phone_number".into(),
+            info.phone_number.to_string().into_value(),
+        );
         d.insert("email".into(), info.email.as_str().into_value());
         d.insert("hetu".into(), info.hetu.as_str().into_value());
-        d.insert("start_time".into(), info.timerange.start().to_string().into_value());
-        d.insert("end_time".into(), info.timerange.end().to_string().into_value());
+        d.insert(
+            "start_time".into(),
+            info.timerange.start().to_string().into_value(),
+        );
+        d.insert(
+            "end_time".into(),
+            info.timerange.end().to_string().into_value(),
+        );
         d.insert(
             "used_outside_finland".into(),
             info.used_outside_finland.into_value(),

@@ -25,12 +25,15 @@ pub async fn send_contract_email(
         content_type: "application/pdf",
         data: data.contract_bytes,
     };
-    service.sender.send(
-        service.config.approver_email.to_string(),
-        subject,
-        html,
-        Box::new([attachment]),
-    ).await
+    service
+        .sender
+        .send(
+            service.config.approver_email.to_string(),
+            subject,
+            html,
+            Box::new([attachment]),
+        )
+        .await
 }
 
 #[derive(Template)]

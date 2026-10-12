@@ -1,14 +1,16 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
+use crate::{
+    domain::{Address, Email, FullName, Hetu, Phone, TimeRange},
+    email::email_templates::ReservationEmail,
+};
 use std::ops::Deref;
-use crate::{domain::{Address, Email, FullName, Hetu, Phone, TimeRange}, email::email_templates::ReservationEmail};
-
 
 //Validated
 
 #[derive(sqlx::FromRow)]
-#[allow(clippy::struct_field_names,unused)]
+#[allow(clippy::struct_field_names, unused)]
 pub struct Reservation {
     pub id: i32,
     pub full_name: FullName,

@@ -4,7 +4,10 @@ use tracing::info;
 use super::{password::check_plain_password, types::Credentials};
 use crate::auth::password::CheckPasswordError;
 use crate::error::AppError;
-use crate::user::{get_users_db::{get_user_by_id, get_user_by_name}, types::User};
+use crate::user::{
+    get_users_db::{get_user_by_id, get_user_by_name},
+    types::User,
+};
 use crate::{error::AppResult, state::app_state::AppState};
 
 // Required by AuthUser

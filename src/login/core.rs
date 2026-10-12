@@ -1,4 +1,3 @@
-
 use anyhow::Context;
 use askama::Template;
 use axum::{
@@ -11,10 +10,7 @@ use tracing::info;
 
 use crate::auth::types::Credentials;
 use crate::{
-    error::{
-        AppError::InvalidCredentials,
-        AppResult,
-    },
+    error::{AppError::InvalidCredentials, AppResult},
     state::app_state::AppState,
 };
 
