@@ -14,7 +14,7 @@ pub trait EmailSender: Send + Sync {
         to: String,
         subject: String,
         html: String,
-        attachments: Box<[Attachment<'_>]>,
+        attachments: Box<[Attachment]>,
     ) -> Result<(), EmailError>;
 }
 

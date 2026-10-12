@@ -39,7 +39,7 @@ impl EmailSender for MailgunService {
         to: String,
         subject: String,
         html: String,
-        attachments: Box<[Attachment<'_>]>,
+        attachments: Box<[Attachment]>,
     ) -> Result<(), EmailError> {
         let mut form = Form::new()
             .text("from", self.from.clone())

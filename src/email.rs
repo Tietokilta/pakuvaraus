@@ -2,7 +2,7 @@ pub mod attachment;
 pub mod email_templates;
 pub mod service;
 
-mod config;
+pub mod config;
 mod test;
 
 #[derive(Debug, thiserror::Error)]

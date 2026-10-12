@@ -1,7 +1,7 @@
 use super::ParseError;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
 #[serde(try_from = "String")]
 #[sqlx(transparent)]
 pub struct NonEmptyText<const N: usize>(String);

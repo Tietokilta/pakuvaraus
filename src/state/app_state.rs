@@ -7,9 +7,11 @@ pub struct AppState {
     pub email: EmailService,
 }
 
-pub async fn new() -> AppState {
-    AppState {
-        db: DbService::create().await,
-        email: EmailService::create(),
+impl AppState {
+    pub async fn new() -> Self {
+        Self {
+            db: DbService::create().await,
+            email: EmailService::create(),
+        }
     }
 }
