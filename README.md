@@ -43,7 +43,7 @@ cargo run
 
 The web UI is available at http://127.0.0.1:3000/login
 
-Default username: `test-user`, default password: `test123`
+Default username: `test-user`, default password: `pass123`
 
 ## API
 
