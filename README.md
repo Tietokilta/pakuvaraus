@@ -1,18 +1,54 @@
 # Pakuvaraus
 
-## Test locally
+## Developing
 
-create .env with DATABASE_URL variable set, which includes the password.
-    DATABASE_URL=postgres://postgres:password123@localhost:5432/postgres
+1. Create an .env file. You can use [.env.example](./.env.example) file as a reference:
 
-run postgres, for example with docker
-    docker run --name postgres -e POSTGRES_PASSWORD=password123 -p 5432:5432 -d postgres
+```sh
+cp .env.example .env
+```
 
-set up the database, install sqlx-cli to run the commands
-    sqlx database create
-    sqlx migrate run
+The following parameters are required: `DATABASE_URL`, `EMAIL_ENABLED`, `APPROVER_EMAIL`.
 
-add and get reservations in powershell:
+2. Start the Postgres database
+
+You can use docker compose ([docker-compose.yml](./docker-compose.yml)):
+
+```sh
+docker compose up
+```
+
+Or run docker directly:
+```
+docker run --name postgres -e POSTGRES_PASSWORD=password123 -p 5432:5432 -d postgres
+```
+
+3. Run the migrations
+
+This will connect to the database set in `DATABASE_URL`. At build time, sqlx will validate the queries against the database.
+
+```sh
+# install sqlx-cli
+cargo install sqlx-cli --no-default-features --features native-tls,postgres
+
+sqlx database create
+sqlx migrate run
+```
+
+4. Start the application
+
+```sh
+cargo run
+```
+
+The web UI is available at http://127.0.0.1:3000/login
+
+Default username: `test-user`, default password: `pass123`
+
+## API
+
+Example using powershell
+
 ```powershell
 $body = @{
     full_name = "Test name 1"
@@ -30,7 +66,9 @@ Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Post -ContentT
 
 Invoke-RestMethod -Uri http://127.0.0.1:3000/reservations -Method Get
 ```
-or in a posix shell with `curl`
+
+Example with `curl`:
+
 ```sh
 curl 'http://127.0.0.1:3000/reservations' \
     -H 'Content-Type: application/json' \
@@ -50,7 +88,3 @@ Invalid input is rejected with `422 Unprocessable Entity` and a plain-text messa
 ```sh
 curl 'http://127.0.0.1:3000/reservations'
 ```
-in browser open
-    http://127.0.0.1:3000/login
-
-sqlx can check queries at compile time, but this requires a postgres instance to be running, if such is not available, set sqlx to offline mode
