@@ -1,5 +1,5 @@
 use super::{NonEmptyText, ParseError};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 macro_rules! nonemptytext_newtype {
     ($(
@@ -8,7 +8,7 @@ macro_rules! nonemptytext_newtype {
     )+) => {
         $(
             $(#[$meta])*
-            #[derive(Debug, Clone, Deserialize, PartialEq, Eq, sqlx::Type)]
+            #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, sqlx::Type)]
             #[sqlx(transparent)]
             #[serde(try_from = "String")]
             pub struct $name(NonEmptyText<$max>);

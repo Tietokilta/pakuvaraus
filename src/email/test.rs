@@ -21,7 +21,7 @@ impl EmailSender for StubService {
         to: String,
         subject: String,
         html: String,
-        attachments: Box<[Attachment<'_>]>,
+        attachments: Box<[Attachment]>,
     ) -> Result<(), EmailError> {
         info!(
             "Send email to: {to}, subject: {subject}, {} attachments, html: {html}",

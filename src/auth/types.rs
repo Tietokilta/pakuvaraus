@@ -1,8 +1,8 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::domain::{ParseError, Username};
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Credentials {
     pub username: Username,
     pub password: PlainPassword,
@@ -16,7 +16,7 @@ pub struct RegisterUserRequest {
     pub password: NewPassword,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct ChangePasswordRequest {
     pub old_password: PlainPassword,
     // `password` and `password_again` in the form
@@ -29,15 +29,21 @@ pub struct ChangePasswordRequest {
 pub struct HashedPassword(pub(crate) String);
 
 impl HashedPassword {
-    pub(crate) fn as_str(&self) -> &str {
+    pub fn as_str(&self) -> &str {
         &self.0
     }
 }
 
-#[derive(Deserialize, Clone, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct PlainPassword(pub String);
 
-#[derive(Deserialize)]
+impl From<String> for PlainPassword {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
+#[derive(Serialize, Deserialize)]
 #[serde(try_from = "RawNewPassword")]
 pub struct NewPassword(PlainPassword);
 

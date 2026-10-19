@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use super::ParseError;
 use serde::Deserialize;
 
@@ -7,14 +9,17 @@ use serde::Deserialize;
 pub struct Email(String);
 
 impl Email {
-    pub fn parse(s: &str) -> Result<Self, ParseError> {
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl FromStr for Email {
+    type Err = ParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let email = s.trim().to_ascii_lowercase();
         garde::rules::email::parse_email(&email).map_err(|_| ParseError::Email)?;
         Ok(Self(email))
-    }
-
-    pub fn as_str(&self) -> &str {
-        &self.0
     }
 }
 
@@ -28,6 +33,6 @@ impl TryFrom<String> for Email {
     type Error = ParseError;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        Self::parse(&value)
+        value.parse()
     }
 }

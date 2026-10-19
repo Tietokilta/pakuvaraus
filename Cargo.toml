@@ -10,6 +10,9 @@ unused_must_use = "deny"
 pedantic = { level = "deny", priority = -1 }
 nursery = { level = "deny", priority = -1 }
 redundant_field_names = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
 indexing_slicing = "deny"
 unreachable = "deny"
 unimplemented = "deny"
@@ -50,3 +53,6 @@ hetu = "0.9.0"
 phonenumber = "0.3.10"
 garde = { version = "0.23.0", features = ["email"] }
 anyhow = "1.0.104"
+
+[dev-dependencies]
+axum-test = "18.2.1" # highest supported by axum 0.8.5
