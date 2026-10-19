@@ -46,16 +46,23 @@ pub struct ReservationEmail<'a> {
     pub used_outside_finland: bool,
 }
 
+#[derive(Template)]
+#[template(path = "email/confirmation_email.html")]
+pub struct ReservationConfirmationEmail<'a> {
+    pub reservation: &'a ReservationEmail<'a>,
+    pub cancel_link: String,
+}
+
 pub async fn send_reservation_email(
     service: &EmailService,
-    data: &ReservationEmail<'_>,
+    data: ReservationConfirmationEmail<'_>,
 ) -> Result<(), EmailError> {
     let html = data.render()?;
 
     service
         .sender
         .send(
-            data.email.to_string(),
+            data.reservation.email.to_string(),
             "Tietokilta van reservation request received".to_string(),
             html,
             Box::new([]),

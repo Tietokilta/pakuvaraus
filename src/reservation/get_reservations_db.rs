@@ -6,7 +6,7 @@ pub async fn get_reservations(db_pool: &PgPool) -> Result<Vec<Reservation>, DbEr
     let res = sqlx::query_as!(
         Reservation,
         r#"
-        SELECT id, full_name AS "full_name: _", email AS "email: _", start_time, end_time, internal, approved
+        SELECT id, full_name AS "full_name: _", email AS "email: _", start_time, end_time, internal, approved, cancelled
         FROM reservations
         "#
     )
@@ -22,7 +22,7 @@ pub async fn get_reservation_by_id(
     let res = sqlx::query_as!(
         Reservation,
         r#"
-        SELECT id, full_name AS "full_name: _", email AS "email: _", start_time, end_time, internal, approved
+        SELECT id, full_name AS "full_name: _", email AS "email: _", start_time, end_time, internal, approved, cancelled
         FROM reservations
         WHERE id = $1
         "#,

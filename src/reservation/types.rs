@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
+use sha2::{Digest, Sha256};
 
 use crate::{
     domain::{Address, Email, FullName, Hetu, Phone, TimeRange},
@@ -19,6 +21,7 @@ pub struct Reservation {
     pub end_time: DateTime<Utc>,
     pub internal: bool,
     pub approved: bool,
+    pub cancelled: bool,
 }
 
 //Sorted validated reservations
@@ -89,4 +92,42 @@ impl From<Reservation> for ReservationItem {
 pub struct Overlap {
     pub other_id: i32,
     pub duration: chrono::Duration,
+}
+
+//Edit key
+
+pub struct EditKey(String);
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct EditKeyHash([u8; 32]);
+
+impl EditKey {
+    pub fn new() -> Self {
+        let mut bytes = [0u8; 32];
+        rand::fill(&mut bytes);
+        Self(URL_SAFE_NO_PAD.encode(bytes))
+    }
+
+    pub fn parse(s: &str) -> Option<Self> {
+        let bytes = URL_SAFE_NO_PAD.decode(s).ok()?;
+        (bytes.len() == 32).then(|| Self(s.to_owned()))
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+
+    pub fn hash(&self) -> EditKeyHash {
+        EditKeyHash(Sha256::digest(self.0.as_bytes()).into())
+    }
+}
+
+impl EditKeyHash {
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.0
+    }
+
+    pub fn from_bytes(bytes: [u8; 32]) -> Self {
+        Self(bytes)
+    }
 }

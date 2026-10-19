@@ -23,6 +23,7 @@ use crate::{
 struct AdminTemplate<'a> {
     reservations: Vec<ReservationView>,
     approved_reservations: Vec<ReservationView>,
+    cancelled_reservations: Vec<ReservationView>,
     admins: Vec<UserView>,
     username: &'a str,
 }
@@ -43,8 +44,9 @@ pub async fn admin_page(auth_session: AuthenticatedSession) -> AppResult<Html<St
 
     Ok(Html(
         AdminTemplate {
-            reservations: views.iter().filter(|r| !r.approved).cloned().collect(),
-            approved_reservations: views.iter().filter(|r| r.approved).cloned().collect(),
+            reservations: views.iter().filter(|r| !r.approved && !r.cancelled).cloned().collect(),
+            approved_reservations: views.iter().filter(|r| r.approved && !r.cancelled).cloned().collect(),
+            cancelled_reservations: views.iter().filter(|r| r.cancelled).cloned().collect(),
             admins: admins
                 .iter()
                 .map(|u| UserView::from_domain(u.id, u.username.clone()))
