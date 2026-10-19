@@ -53,6 +53,9 @@ hetu = "0.9.0"
 phonenumber = "0.3.10"
 garde = { version = "0.23.0", features = ["email"] }
 anyhow = "1.0.104"
+base64 = "0.23.1"
+rand = "0.10.3"
+sha2 = "0.11.1"
 
 [dev-dependencies]
 axum-test = "18.2.1" # highest supported by axum 0.8.5

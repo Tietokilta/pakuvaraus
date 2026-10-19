@@ -40,6 +40,7 @@ pub struct ReservationView {
     pub email: String,
     pub internal: bool,
     pub approved: bool,
+    pub cancelled: bool,
     pub overlaps: Vec<OverlapView>,
 }
 
@@ -72,6 +73,7 @@ impl ReservationView {
             email: r.email.as_str().to_string(),
             internal: r.internal,
             approved: r.approved,
+            cancelled: r.cancelled,
             overlaps: overlaps.iter().map(OverlapView::from_domain).collect(),
         }
     }

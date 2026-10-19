@@ -1,0 +1,15 @@
+<h1>Reservation request received</h1>
+
+<table role="presentation" cellpadding="4">
+  <tr><th align="left">Name</th><td>{{ reservation.name }}</td></tr>
+  <tr><th align="left">Email</th><td>{{ reservation.email }}</td></tr>
+  <tr><th align="left">Phone number</th><td>{{ reservation.phone_number }}</td></tr>
+  <tr><th align="left">Start time</th><td>{{ reservation.timerange.start() }}</td></tr>
+  <tr><th align="left">End time</th><td>{{ reservation.timerange.end() }}</td></tr>
+  <tr><th align="left">Used outside Finland</th><td>{{ reservation.used_outside_finland }}</td></tr>
+</table>
+
+<p>
+  <a href="{{ cancel_link }}">Cancel reservation</a>
+</p>
+<p>Link text: {{ cancel_link }}</p>

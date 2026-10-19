@@ -134,6 +134,49 @@
           </table>
         </div>
       </div>
+
+      <div class="box">
+        <h2>Cancelled reservations</h2>
+
+        <div class="scroll-box">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+                <th>Email</th>
+                <th>Guild</th>
+                <th>Overlaps</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in cancelled_reservations %}
+              <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.start_time }}</td>
+                <td>{{ r.end_time }}</td>
+                <td>{{ r.duration }}</td>
+                <td>{{ r.email }}</td>
+                <td>{{ r.internal }}</td>
+                <td>
+                  {% for o in r.overlaps %}
+                    <div>
+                      {{ o.id }} - ({{ o.duration }})
+                    </div>
+                  {% endfor %}
+                </td>
+                <td>
+                  <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </body>
 </html>

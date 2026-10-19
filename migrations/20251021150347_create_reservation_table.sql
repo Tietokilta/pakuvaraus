@@ -6,6 +6,8 @@ CREATE TABLE reservations (
     end_time TIMESTAMPTZ NOT NULL,
     internal BOOLEAN NOT NULL,
     approved BOOLEAN NOT NULL DEFAULT false,
+    cancelled BOOLEAN NOT NULL DEFAULT false,
+    edit_key BYTEA NOT NULL,
     CONSTRAINT start_before_end CHECK (start_time < end_time),
     CONSTRAINT block_overlapping_times
     EXCLUDE USING gist (
