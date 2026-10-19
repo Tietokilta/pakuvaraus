@@ -9,6 +9,9 @@ use axum::{
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/reservations", post(make_reservation))
-        .route("/reservations/cancel/{raw_edit_key}", post(cancel_reservation))
+        .route(
+            "/reservations/cancel/{raw_edit_key}",
+            post(cancel_reservation),
+        )
         .route("/reservations", get(get_reservations))
 }

@@ -1,15 +1,19 @@
 use anyhow::Context;
-use axum::extract::{Json, State, Path};
+use axum::extract::{Json, Path, State};
 
 use tracing::{error, info};
 
 use crate::{
     contract,
     email::email_templates::{
-        ContractEmail, ReservationEmail, ReservationConfirmationEmail, send_contract_email, send_reservation_email,
+        ContractEmail, ReservationConfirmationEmail, ReservationEmail, send_contract_email,
+        send_reservation_email,
     },
-    error::{AppResult, AppError},
-    reservation::{edit_reservation_db::set_cancel_by_key, types::{CreateReservation, EditKey}},
+    error::{AppError, AppResult},
+    reservation::{
+        edit_reservation_db::set_cancel_by_key,
+        types::{CreateReservation, EditKey},
+    },
     state::app_state::AppState,
 };
 
@@ -37,7 +41,12 @@ pub async fn make_reservation(
 
     // TODO: what if adding reservation works, but email fails?
     let edit_key = EditKey::new();
-    crate::reservation::add_reservation_db::add_reservation(&state.db.pool, &payload, edit_key.hash()).await?;
+    crate::reservation::add_reservation_db::add_reservation(
+        &state.db.pool,
+        &payload,
+        edit_key.hash(),
+    )
+    .await?;
 
     let reservation_email: ReservationEmail<'_> = (&payload).into();
     let _unhandled = send_contract_email(
@@ -51,11 +60,12 @@ pub async fn make_reservation(
     .inspect_err(|err| error!(?err, "failed to send contract email"));
 
     // Reservation already created, so don't return an error if email send fails
-    let _unhandled = send_reservation_email(&state.email,
-        ReservationConfirmationEmail { 
+    let _unhandled = send_reservation_email(
+        &state.email,
+        ReservationConfirmationEmail {
             reservation: &reservation_email,
             cancel_link: cancel_link("", &edit_key),
-        }
+        },
     )
     .await
     .inspect_err(|err| error!(?err, "failed to send reservation email"));
@@ -68,7 +78,7 @@ pub async fn cancel_reservation(
     Path(raw_edit_key): Path<String>,
 ) -> AppResult<()> {
     info!("Cancel reservation");
-    
+
     let edit_key = EditKey::parse(&raw_edit_key).ok_or(AppError::NotFound)?;
 
     if !set_cancel_by_key(&state.db.pool, &edit_key.hash(), true).await? {

@@ -44,8 +44,16 @@ pub async fn admin_page(auth_session: AuthenticatedSession) -> AppResult<Html<St
 
     Ok(Html(
         AdminTemplate {
-            reservations: views.iter().filter(|r| !r.approved && !r.cancelled).cloned().collect(),
-            approved_reservations: views.iter().filter(|r| r.approved && !r.cancelled).cloned().collect(),
+            reservations: views
+                .iter()
+                .filter(|r| !r.approved && !r.cancelled)
+                .cloned()
+                .collect(),
+            approved_reservations: views
+                .iter()
+                .filter(|r| r.approved && !r.cancelled)
+                .cloned()
+                .collect(),
             cancelled_reservations: views.iter().filter(|r| r.cancelled).cloned().collect(),
             admins: admins
                 .iter()
