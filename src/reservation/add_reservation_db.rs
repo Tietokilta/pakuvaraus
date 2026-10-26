@@ -1,7 +1,7 @@
 use sqlx::postgres::PgPool;
 
 use crate::db::{DbError, ResultExt};
-use crate::reservation::types::{CreateReservation, Reservation, EditKeyHash};
+use crate::reservation::types::{CreateReservation, EditKeyHash, Reservation};
 
 pub async fn add_reservation(
     db_pool: &PgPool,

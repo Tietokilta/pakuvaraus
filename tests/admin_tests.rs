@@ -1,9 +1,9 @@
-use axum_test::TestServer;
 use pakuvaraus::{
     auth::register_user::register_user,
     domain::Username,
     reservation::{
         add_reservation_db::add_reservation, get_reservations_db::get_reservation_by_id,
+        types::EditKey,
     },
     user::get_users_db::get_user_by_id,
 };
@@ -162,9 +162,11 @@ async fn remove_admin_rejects_nonexistent(pool: PgPool) {
 #[sqlx::test]
 async fn remove_reservation_works(pool: PgPool) {
     let (server, _) = common::create_authed_test_server(pool.clone()).await;
+
     let reservation = add_reservation(
         &pool,
         &serde_json::from_value(valid_create_reservation_json()).unwrap(),
+        EditKey::new().hash(),
     )
     .await
     .expect("adding reservation to db to work");
