@@ -102,3 +102,62 @@ th, td {
 tbody tr:hover {
   background-color: #f9fbfd;
 }
+
+/* Action buttons inside tables */
+form.inline {
+  display: inline;
+  margin: 0;
+}
+
+form.inline + form.inline {
+  margin-left: 6px;
+}
+
+.action {
+  padding: 4px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  color: #333;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.action:hover {
+  background-color: #f0f4f8;
+  border-color: #aaa;
+}
+
+.action:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+/* Primary action */
+.action.primary {
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+.action.primary:hover {
+  background-color: #4a90e2;
+  color: white;
+}
+
+/* Destructive actions */
+.action.danger {
+  border-color: #d9534f;
+  color: #d9534f;
+}
+
+.action.danger:hover {
+  background-color: #d9534f;
+  border-color: #d9534f;
+  color: white;
+}
+
+.action.danger:focus-visible {
+  outline-color: #d9534f;
+}

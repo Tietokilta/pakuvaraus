@@ -12,13 +12,13 @@ use axum::{
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/admin", get(admin_page))
-        .route("/admin/{user_id}/remove", get(remove_admin))
+        .route("/admin/{user_id}/remove", post(remove_admin))
         .route("/admin/new", get(get_new_admin_page))
         .route("/admin/new", post(new_admin))
         .route("/admin/password", get(get_change_password_page))
         .route("/admin/password", post(change_password))
-        .route("/admin/reservations/{id}/remove", get(remove_reservation))
-        .route("/admin/reservations/{id}/cancel", get(cancel_reservation))
-        .route("/admin/reservations/{id}/restore", get(restore_reservation))
-        .route("/admin/reservations/{id}/approve", get(approve_reservation))
+        .route("/admin/reservations/{id}/remove", post(remove_reservation))
+        .route("/admin/reservations/{id}/cancel", post(cancel_reservation))
+        .route("/admin/reservations/{id}/restore", post(restore_reservation))
+        .route("/admin/reservations/{id}/approve", post(approve_reservation))
 }

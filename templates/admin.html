@@ -34,7 +34,10 @@
                 <td>{{ admin.id }}</td>
                 <td><strong>{{ admin.username }}</strong></td>
                 <td>
-                  <a href="/admin/{{ admin.id }}/cancel">cancel</a>
+                  <form method="post" action="/admin/{{ admin.id }}/remove" class="inline"
+                        onsubmit="return confirm('Remove administrator?')">
+                    <button type="submit" class="action danger">delete</button>
+                  </form>
                 </td>
               </tr>
               {% endfor %}
@@ -82,8 +85,13 @@
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="/admin/reservations/{{ r.id }}/cancel">cancel</a>
-                  <a href="/admin/reservations/{{ r.id }}/approve">approve</a>
+                  <form method="post" action="/admin/reservations/{{ r.id }}/cancel" class="inline"
+                        onsubmit="return confirm('Cancel reservation?')">
+                    <button type="submit" class="action danger">cancel</button>
+                  </form>
+                  <form method="post" action="/admin/reservations/{{ r.id }}/approve" class="inline">
+                    <button type="submit" class="action primary">approve</button>
+                  </form>
                 </td>
               </tr>
               {% endfor %}
@@ -126,7 +134,10 @@
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="/admin/reservations/{{ r.id }}/cancel">cancel</a>
+                  <form method="post" action="/admin/reservations/{{ r.id }}/cancel" class="inline"
+                        onsubmit="return confirm('Cancel reservation?')">
+                    <button type="submit" class="action danger">cancel</button>
+                  </form>
                 </td>
               </tr>
               {% endfor %}
@@ -169,8 +180,13 @@
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
-                  <a href="/admin/reservations/{{ r.id }}/restore">restore</a>
+                  <form method="post" action="/admin/reservations/{{ r.id }}/remove" class="inline"
+                        onsubmit="return confirm('Permanently delete reservation?')">
+                    <button type="submit" class="action danger">delete</button>
+                  </form>
+                  <form method="post" action="/admin/reservations/{{ r.id }}/restore" class="inline">
+                    <button type="submit" class="action">restore</button>
+                  </form>
                 </td>
               </tr>
               {% endfor %}
@@ -179,5 +195,17 @@
         </div>
       </div>
     </div>
+    <script>
+      const y = sessionStorage.getItem('page_scroll_y');
+      if (y !== null) {
+        window.scrollTo(0, parseInt(y, 10));
+        sessionStorage.removeItem('page_scroll_y');
+      }
+      document.addEventListener('submit', (e) => {
+        if (!e.defaultPrevented) {
+          sessionStorage.setItem('page_scroll_y', window.scrollY);
+        }
+      });
+    </script>
   </body>
 </html>
