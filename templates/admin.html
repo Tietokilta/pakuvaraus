@@ -34,7 +34,7 @@
                 <td>{{ admin.id }}</td>
                 <td><strong>{{ admin.username }}</strong></td>
                 <td>
-                  <a href="/admin/{{ admin.id }}/remove">delete</a>
+                  <a href="/admin/{{ admin.id }}/cancel">cancel</a>
                 </td>
               </tr>
               {% endfor %}
@@ -82,7 +82,7 @@
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
+                  <a href="/admin/reservations/{{ r.id }}/cancel">cancel</a>
                   <a href="/admin/reservations/{{ r.id }}/approve">approve</a>
                 </td>
               </tr>
@@ -126,7 +126,7 @@
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
+                  <a href="/admin/reservations/{{ r.id }}/cancel">cancel</a>
                 </td>
               </tr>
               {% endfor %}
@@ -170,6 +170,7 @@
                 </td>
                 <td>
                   <a href="/admin/reservations/{{ r.id }}/remove">delete</a>
+                  <a href="/admin/reservations/{{ r.id }}/restore">restore</a>
                 </td>
               </tr>
               {% endfor %}
