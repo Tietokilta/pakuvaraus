@@ -1,9 +1,9 @@
-use axum_test::TestServer;
 use pakuvaraus::{
     auth::register_user::register_user,
     domain::Username,
     reservation::{
         add_reservation_db::add_reservation, get_reservations_db::get_reservation_by_id,
+        types::EditKey,
     },
     user::get_users_db::get_user_by_id,
 };
@@ -134,7 +134,7 @@ async fn remove_admin_works(pool: PgPool) {
     assert!(db_user_exists(&pool, username.as_str()).await);
 
     server
-        .get(&format!("/admin/{}/remove", user.id))
+        .post(&format!("/admin/{}/remove", user.id))
         .await
         .assert_status_in_range(200..400);
 
@@ -154,7 +154,7 @@ async fn remove_admin_rejects_nonexistent(pool: PgPool) {
     );
 
     server
-        .get(&format!("/admin/{user_id}/remove"))
+        .post(&format!("/admin/{user_id}/remove"))
         .await
         .assert_status_not_found();
 }
@@ -162,15 +162,17 @@ async fn remove_admin_rejects_nonexistent(pool: PgPool) {
 #[sqlx::test]
 async fn remove_reservation_works(pool: PgPool) {
     let (server, _) = common::create_authed_test_server(pool.clone()).await;
+
     let reservation = add_reservation(
         &pool,
         &serde_json::from_value(valid_create_reservation_json()).unwrap(),
+        EditKey::new().hash(),
     )
     .await
     .expect("adding reservation to db to work");
 
     server
-        .get(&format!("/admin/reservations/{}/remove", reservation.id))
+        .post(&format!("/admin/reservations/{}/remove", reservation.id))
         .await
         .assert_status_in_range(200..400);
 
@@ -194,7 +196,7 @@ async fn remove_reservation_rejects_nonexistent(pool: PgPool) {
     );
 
     server
-        .get(&format!("/admin/reservations/{id}/remove"))
+        .post(&format!("/admin/reservations/{id}/remove"))
         .await
         .assert_status_not_found();
 }

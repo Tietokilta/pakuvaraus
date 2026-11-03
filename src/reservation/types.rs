@@ -123,11 +123,11 @@ impl EditKey {
 }
 
 impl EditKeyHash {
-    pub fn as_bytes(&self) -> &[u8; 32] {
+    pub const fn as_bytes(&self) -> &[u8; 32] {
         &self.0
     }
 
-    pub fn from_bytes(bytes: [u8; 32]) -> Self {
+    pub const fn from_bytes(bytes: [u8; 32]) -> Self {
         Self(bytes)
     }
 }

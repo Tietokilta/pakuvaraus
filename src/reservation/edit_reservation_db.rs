@@ -21,11 +21,7 @@ pub async fn set_cancel_by_key(
     Ok(res.rows_affected() == 1)
 }
 
-pub async fn set_cancel_by_id(
-    db_pool: &PgPool,
-    id: i32,
-    cancel: bool,
-) -> Result<bool, DbError> {
+pub async fn set_cancel_by_id(db_pool: &PgPool, id: i32, cancel: bool) -> Result<bool, DbError> {
     let res = sqlx::query!(
         r#"
         UPDATE reservations SET cancelled = $2 WHERE id = $1
