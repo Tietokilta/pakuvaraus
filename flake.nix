@@ -39,7 +39,6 @@
           }
         );
 
-        # src = craneLib.path ./.;
         src = lib.fileset.toSource {
           root = ./.;
           fileset = lib.fileset.unions [
@@ -60,15 +59,13 @@
             OPENSSL_DIR = "${pkgs.openssl.dev}";
             OPENSSL_LIB_DIR = "${pkgs.lib.getLib pkgs.openssl}/lib";
           };
-
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
       in
       {
         packages = {
           pakuvaraus = craneLib.buildPackage (
-            commonArgs
-            // {
+            commonArgs // {
               inherit cargoArtifacts;
               nativeBuildInputs = with pkgs; [
                 sqlx-cli
@@ -89,18 +86,40 @@
               '';
             }
           );
+
+          docker = pkgs.dockerTools.buildLayeredImage {
+            name = "pakuvaraus";
+            tag = "latest";
+
+            contents = [
+              self.packages.${system}.pakuvaraus
+              pkgs.cacert
+            ];
+
+            config = {
+              Cmd = [ "/bin/pakuvaraus" ];
+              ExposedPorts."3000/tcp" = { };
+            };
+          };
+
           default = self.packages.${system}.pakuvaraus;
         };
         checks = {
           inherit (self.packages.${system}) pakuvaraus;
-          formatting = pkgs.runCommand "cargo-fmt-check" { nativeBuildInputs = [ craneLib.cargo ]; } ''
+
+          formatting = pkgs.runCommand "cargo-fmt-check" {
+            nativeBuildInputs = [ craneLib.cargo ];
+          } ''
             cd ${src}
             cargo fmt --check
             touch $out
           '';
         };
         devShells.default = craneLib.devShell {
-          checks = { inherit (self.packages.${system}) pakuvaraus; };
+          checks = {
+            inherit (self.packages.${system}) pakuvaraus;
+          };
+
           inherit (commonArgs) env;
         };
       }
