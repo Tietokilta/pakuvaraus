@@ -31,6 +31,13 @@ macro_rules! nonemptytext_newtype {
                 }
             }
 
+            impl utoipa::PartialSchema for $name {
+                fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::Schema> {
+                    <NonEmptyText<$max> as utoipa::PartialSchema>::schema()
+                }
+            }
+            impl utoipa::ToSchema for $name {}
+
             impl From<$name> for String {
                 fn from(value: $name) -> String {
                     value.0.into()

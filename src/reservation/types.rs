@@ -49,17 +49,10 @@ impl Deref for SortedReservations {
 
 #[derive(Debug, Clone, Deserialize, ToSchema)]
 pub struct CreateReservation {
-    #[schema(value_type = String, min_length = 1, max_length = 512)]
     pub full_name: FullName,
-    #[schema(value_type = String, min_length = 1, max_length = 128)]
     pub address: Address,
-    #[schema(value_type = String, format = Email)]
     pub email: Email,
-    /// Phone number; a number without a country code is read as Finnish
-    #[schema(value_type = String)]
     pub phone_number: Phone,
-    /// Finnish personal identity code (henkilötunnus)
-    #[schema(value_type = String)]
     pub hetu: Hetu,
     // `start_time` and `end_time` in the JSON
     #[serde(flatten)]

@@ -148,6 +148,11 @@
   },
   "components": {
     "schemas": {
+      "Address": {
+        "type": "string",
+        "maxLength": 128,
+        "minLength": 1
+      },
       "CreateReservation": {
         "allOf": [
           {
@@ -181,30 +186,23 @@
             ],
             "properties": {
               "address": {
-                "type": "string",
-                "maxLength": 128,
-                "minLength": 1
+                "$ref": "#/components/schemas/Address"
               },
               "email": {
-                "type": "string",
-                "format": "email"
+                "$ref": "#/components/schemas/Email"
               },
               "full_name": {
-                "type": "string",
-                "maxLength": 512,
-                "minLength": 1
+                "$ref": "#/components/schemas/FullName"
               },
               "hetu": {
-                "type": "string",
-                "description": "Finnish personal identity code (henkilötunnus)"
+                "$ref": "#/components/schemas/Hetu"
               },
               "internal": {
                 "type": "boolean",
                 "description": "Reserved for guild use rather than a member's personal use"
               },
               "phone_number": {
-                "type": "string",
-                "description": "Phone number; a number without a country code is read as Finnish"
+                "$ref": "#/components/schemas/Phone"
               },
               "used_outside_finland": {
                 "type": "boolean"
@@ -212,6 +210,10 @@
             }
           }
         ]
+      },
+      "Email": {
+        "type": "string",
+        "format": "email"
       },
       "ErrorResponse": {
         "type": "object",
@@ -225,6 +227,19 @@
             "description": "Human-readable description of the error"
           }
         }
+      },
+      "FullName": {
+        "type": "string",
+        "maxLength": 512,
+        "minLength": 1
+      },
+      "Hetu": {
+        "type": "string",
+        "description": "Finnish personal identity code (henkilötunnus)"
+      },
+      "Phone": {
+        "type": "string",
+        "description": "Phone number; a number without a country code is read as Finnish"
       },
       "ReservationItem": {
         "type": "object",

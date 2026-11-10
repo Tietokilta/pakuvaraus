@@ -48,29 +48,34 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Address: string;
         CreateReservation: {
             /** Format: date-time */
             end_time: string;
             /** Format: date-time */
             start_time: string;
         } & {
-            address: string;
-            /** Format: email */
-            email: string;
-            full_name: string;
-            /** @description Finnish personal identity code (henkilötunnus) */
-            hetu: string;
+            address: components["schemas"]["Address"];
+            email: components["schemas"]["Email"];
+            full_name: components["schemas"]["FullName"];
+            hetu: components["schemas"]["Hetu"];
             /** @description Reserved for guild use rather than a member's personal use */
             internal: boolean;
-            /** @description Phone number; a number without a country code is read as Finnish */
-            phone_number: string;
+            phone_number: components["schemas"]["Phone"];
             used_outside_finland: boolean;
         };
+        /** Format: email */
+        Email: string;
         /** @description Body of every error response that the app itself produces. */
         ErrorResponse: {
             /** @description Human-readable description of the error */
             error: string;
         };
+        FullName: string;
+        /** @description Finnish personal identity code (henkilötunnus) */
+        Hetu: string;
+        /** @description Phone number; a number without a country code is read as Finnish */
+        Phone: string;
         ReservationItem: {
             /** Format: date-time */
             end_time: string;
@@ -84,8 +89,13 @@ export interface components {
     headers: never;
     pathItems: never;
 }
+export type Address = components['schemas']['Address'];
 export type CreateReservation = components['schemas']['CreateReservation'];
+export type Email = components['schemas']['Email'];
 export type ErrorResponse = components['schemas']['ErrorResponse'];
+export type FullName = components['schemas']['FullName'];
+export type Hetu = components['schemas']['Hetu'];
+export type Phone = components['schemas']['Phone'];
 export type ReservationItem = components['schemas']['ReservationItem'];
 export type $defs = Record<string, never>;
 export interface operations {
