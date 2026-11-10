@@ -6,3 +6,5 @@
 .direnv
 .devenv
 result*
+
+.amp/portals/

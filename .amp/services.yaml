@@ -1,0 +1,10 @@
+services:
+  postgres:
+    command: nix develop -c sh -c '[ -d ~/pgdata ] || initdb -D ~/pgdata -U postgres --auth=trust; exec postgres -D ~/pgdata -k /tmp'
+    port: 5432
+  app:
+    command: nix develop -c sh -c 'sqlx database create && sqlx migrate run && exec cargo run'
+    port: 3000
+    portal:
+      url: /login
+      title: pakuvaraus dev
