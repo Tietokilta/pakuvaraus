@@ -1,1 +1,4 @@
 node_modules/
+# Generated, see README.md
+openapi.json
+schema.d.ts

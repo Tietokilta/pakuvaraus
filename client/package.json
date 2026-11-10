@@ -23,7 +23,7 @@
     "schema.d.ts"
   ],
   "scripts": {
-    "generate": "openapi-typescript ../openapi.json --root-types --root-types-no-schema-prefix --output schema.d.ts",
+    "generate": "openapi-typescript openapi.json --root-types --root-types-no-schema-prefix --output schema.d.ts",
     "typecheck": "tsc"
   },
   "dependencies": {

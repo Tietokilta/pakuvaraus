@@ -44,7 +44,6 @@
           fileset = lib.fileset.unions [
             (craneLib.fileset.commonCargoSources ./.)
             ./migrations
-            ./openapi.json
             ./static
             ./templates
           ];
@@ -63,7 +62,7 @@
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
 
-        # TypeScript client generated from openapi.json, see client/README.md
+        # TypeScript client generated from the API's OpenAPI spec, see client/README.md
         inherit (pkgs) nodejs;
         pnpm = pkgs.pnpm_11;
         clientPnpmDeps = pkgs.fetchPnpmDeps {
@@ -78,20 +77,6 @@
           inherit pnpm;
           fetcherVersion = 4;
           hash = "sha256-Ex6bVxt+bBUM0keBo6UYlXluguQS55kwL9LpUC6kzo8=";
-        };
-        updateApiClient = pkgs.writeShellApplication {
-          name = "update-api-client";
-          runtimeInputs = [
-            nodejs
-            pnpm
-          ];
-          text = ''
-            cd "$(git rev-parse --show-toplevel)"
-            UPDATE_OPENAPI=1 cargo test --quiet --test openapi_tests
-            cd client
-            pnpm install --frozen-lockfile
-            pnpm run generate
-          '';
         };
       in
       {
@@ -134,22 +119,20 @@
             };
           };
 
-          default = self.packages.${system}.pakuvaraus;
-        };
-        checks = {
-          inherit (self.packages.${system}) pakuvaraus;
-          # Fails when client/schema.d.ts was not regenerated from openapi.json.
-          # The pakuvaraus check's tests fail when openapi.json is stale.
+          # OpenAPI description of the public API, generated from the handlers
+          openapi-spec = pkgs.runCommand "openapi.json" { } ''
+            ${self.packages.${system}.pakuvaraus}/bin/pakuvaraus-openapi > $out
+          '';
+
+          # The publishable npm package: types generated from openapi-spec,
+          # typechecked, and packed with the files listed in package.json
           api-client = pkgs.stdenvNoCC.mkDerivation {
-            name = "pakuvaraus-api-client-check";
+            pname = "pakuvaraus-client";
+            inherit ((lib.importJSON ./client/package.json)) version;
             src = lib.fileset.toSource {
-              root = ./.;
-              fileset = lib.fileset.unions [
-                ./openapi.json
-                (lib.fileset.difference ./client (lib.fileset.maybeMissing ./client/node_modules))
-              ];
+              root = ./client;
+              fileset = lib.fileset.difference ./client (lib.fileset.maybeMissing ./client/node_modules);
             };
-            pnpmRoot = "client";
             pnpmDeps = clientPnpmDeps;
             nativeBuildInputs = [
               nodejs
@@ -157,15 +140,22 @@
               pkgs.pnpmConfigHook
             ];
             buildPhase = ''
-              cd client
-              cp schema.d.ts committed-schema.d.ts
+              cp ${self.packages.${system}.openapi-spec} openapi.json
               pnpm run generate
-              diff -u committed-schema.d.ts schema.d.ts \
-                || { echo "client/schema.d.ts is stale, run update-api-client in the dev shell"; exit 1; }
               pnpm run typecheck
             '';
-            installPhase = "touch $out";
+            installPhase = ''
+              export HOME=$TMPDIR
+              mkdir -p $out
+              tar xzf "$(npm pack --silent)" --strip-components=1 -C $out
+            '';
           };
+
+          default = self.packages.${system}.pakuvaraus;
+        };
+        checks = {
+          inherit (self.packages.${system}) pakuvaraus;
+          inherit (self.packages.${system}) api-client;
           formatting = pkgs.runCommand "cargo-fmt-check" {
             nativeBuildInputs = [ craneLib.cargo ];
           } ''
@@ -183,7 +173,6 @@
           packages = [
             nodejs
             pnpm
-            updateApiClient
           ];
         };
       }

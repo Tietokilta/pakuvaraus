@@ -2,6 +2,7 @@
 name = "pakuvaraus"
 version = "0.1.0"
 edition = "2024"
+default-run = "pakuvaraus"
 
 [lints.rust]
 unused_must_use = "deny"
