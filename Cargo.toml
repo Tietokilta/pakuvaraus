@@ -56,6 +56,8 @@ anyhow = "1.0.104"
 base64 = "0.23.1"
 rand = "0.10.3"
 sha2 = "0.11.1"
+utoipa = { version = "6", features = ["axum_extras", "chrono"] }
+utoipa-axum = "0.3"
 
 [dev-dependencies]
 axum-test = "18.2.1" # highest supported by axum 0.8.5

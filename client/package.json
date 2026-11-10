@@ -1,0 +1,36 @@
+{
+  "name": "@tietokilta/pakuvaraus-client",
+  "version": "0.1.0",
+  "description": "Typed fetch client for the pakuvaraus API, generated from its OpenAPI spec",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tietokilta/pakuvaraus.git",
+    "directory": "client"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "schema.d.ts"
+  ],
+  "scripts": {
+    "generate": "openapi-typescript ../openapi.json --root-types --root-types-no-schema-prefix --output schema.d.ts",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0",
+    "typescript": "^5.9.3"
+  }
+}

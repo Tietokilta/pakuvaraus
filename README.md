@@ -47,6 +47,8 @@ Default username: `test-user`, default password: `pass123`
 
 ## API
 
+The public API is described by [openapi.json](./openapi.json), generated from the handlers and also served at `/openapi.json`. A typed TypeScript client is in [client/](./client/README.md). After changing the API, run `update-api-client` in `nix develop`; `nix flake check` fails when either file is stale.
+
 Example using powershell
 
 ```powershell

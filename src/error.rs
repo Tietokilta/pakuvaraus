@@ -2,9 +2,17 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use serde::Serialize;
 use tracing::{debug, error};
+use utoipa::ToSchema;
 
 use crate::auth::change_password::ChangePasswordError;
 use crate::db::DbError;
+
+/// Body of every error response that the app itself produces.
+#[derive(Serialize, ToSchema)]
+pub struct ErrorResponse {
+    /// Human-readable description of the error
+    pub error: String,
+}
 
 pub type AppResult<T, E = AppError> = Result<T, E>;
 
@@ -66,11 +74,6 @@ impl AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        #[derive(Serialize)]
-        struct ErrorResponse {
-            error: String,
-        }
-
         let status = self.status_code();
         if status.is_server_error() {
             error!(?self);

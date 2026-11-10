@@ -1,0 +1,248 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "pakuvaraus",
+    "description": "Public API for requesting and cancelling van reservations.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/reservations": {
+      "get": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "List the time slots of all reservations.",
+        "operationId": "get_reservations",
+        "responses": {
+          "200": {
+            "description": "Every reservation, including pending and cancelled ones",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReservationItem"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Request a reservation.",
+        "description": "Generates the rental contract, emails it to the approver, and emails the\nrequester a confirmation with a cancel key. The reservation stays pending\nuntil an admin approves it.",
+        "operationId": "make_reservation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Reservation requested. The response body is empty."
+          },
+          "400": {
+            "description": "The body is not valid JSON",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The time overlaps another internal reservation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "A field is missing or invalid; the message names the problem",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reservations/cancel/{edit_key}": {
+      "post": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Cancel a reservation with the key from its confirmation email.",
+        "operationId": "cancel_reservation",
+        "parameters": [
+          {
+            "name": "edit_key",
+            "in": "path",
+            "description": "Key from the confirmation email",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reservation cancelled. The response body is empty."
+          },
+          "404": {
+            "description": "No reservation has this key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateReservation": {
+        "allOf": [
+          {
+            "type": "object",
+            "description": "`start_time` must be before `end_time`.",
+            "required": [
+              "start_time",
+              "end_time"
+            ],
+            "properties": {
+              "end_time": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "start_time": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "full_name",
+              "address",
+              "email",
+              "phone_number",
+              "hetu",
+              "internal",
+              "used_outside_finland"
+            ],
+            "properties": {
+              "address": {
+                "type": "string",
+                "maxLength": 128,
+                "minLength": 1
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "full_name": {
+                "type": "string",
+                "maxLength": 512,
+                "minLength": 1
+              },
+              "hetu": {
+                "type": "string",
+                "description": "Finnish personal identity code (henkilötunnus)"
+              },
+              "internal": {
+                "type": "boolean",
+                "description": "Reserved for guild use rather than a member's personal use"
+              },
+              "phone_number": {
+                "type": "string",
+                "description": "Phone number; a number without a country code is read as Finnish"
+              },
+              "used_outside_finland": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Body of every error response that the app itself produces.",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Human-readable description of the error"
+          }
+        }
+      },
+      "ReservationItem": {
+        "type": "object",
+        "required": [
+          "start_time",
+          "end_time"
+        ],
+        "properties": {
+          "end_time": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

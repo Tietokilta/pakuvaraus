@@ -1,4 +1,4 @@
-use axum::Router;
+use axum::{Json, Router, routing::get};
 use axum_login::{AuthManagerLayerBuilder, login_required};
 use axum_messages::MessagesManagerLayer;
 use tower_http::services::ServeDir;
@@ -23,6 +23,11 @@ pub mod state;
 pub mod user;
 mod util;
 
+/// `OpenAPI` description of the public API, served at `/openapi.json`.
+pub fn openapi() -> utoipa::openapi::OpenApi {
+    api::routes::router().into_openapi()
+}
+
 pub fn app(app_state: AppState) -> Router {
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)
@@ -38,6 +43,7 @@ pub fn app(app_state: AppState) -> Router {
             login_url = "/login"
         ))
         .merge(api::routes::router())
+        .route("/openapi.json", get(|| async { Json(openapi()) }))
         .with_state(app_state)
         .merge(login::routes::router())
         .nest_service("/static", ServeDir::new("static"))

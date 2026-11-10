@@ -1,0 +1,77 @@
+name: Publish API client
+# On every push to main that touches client/, publishes the package to npm if
+# its contents differ from the latest published version. The version is
+# bumped automatically: the next patch after the latest published
+# `<major>.<minor>.x`, with major and minor taken from client/package.json.
+# Uses npm trusted publishing (OIDC), so no npm token is stored in the repo.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "client/**"
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: publish-client
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+      # schema.d.ts is committed and kept current by `nix flake check`, so
+      # there is nothing to build.
+      - name: Publish if the contents changed
+        run: |
+          name=$(node -p 'require("./package.json").name')
+          line=$(node -p 'require("./package.json").version.split(".").slice(0, 2).join(".")')
+          # Latest published patch in this major.minor line, empty if none
+          # (an unpublished package prints an `{ "error": ... }` object instead)
+          latest=$({ npm view "$name" versions --json 2>/dev/null || true; } | LINE="$line" node -e '
+            const input = require("node:fs").readFileSync(0, "utf8").trim() || "[]";
+            const prefix = process.env.LINE + ".";
+            const patches = [].concat(JSON.parse(input))
+              .filter((v) => typeof v === "string" && v.startsWith(prefix))
+              .map((v) => Number(v.slice(prefix.length)))
+              .filter(Number.isInteger);
+            if (patches.length) console.log(Math.max(...patches));
+          ')
+
+          if [ -z "$latest" ]; then
+            next="$line.0"
+          else
+            # Compare the packed contents, ignoring the version field
+            unpack() {
+              mkdir -p "$2"
+              tar xzf "$(npm pack "$1" --pack-destination "$2" --silent | tail -1 | sed "s|^|$2/|")" -C "$2"
+              node -e '
+                const fs = require("node:fs"), f = process.argv[1];
+                const pkg = JSON.parse(fs.readFileSync(f, "utf8"));
+                delete pkg.version;
+                fs.writeFileSync(f, JSON.stringify(pkg, null, 2));
+              ' "$2/package/package.json"
+            }
+            unpack . "$RUNNER_TEMP/new"
+            unpack "$name@$line.$latest" "$RUNNER_TEMP/old"
+            if diff -r "$RUNNER_TEMP/old/package" "$RUNNER_TEMP/new/package"; then
+              echo "Contents match $name@$line.$latest, nothing to publish"
+              exit 0
+            fi
+            next="$line.$((latest + 1))"
+          fi
+
+          npm version "$next" --no-git-tag-version --allow-same-version
+          npm publish
