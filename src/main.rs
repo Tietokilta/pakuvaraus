@@ -23,15 +23,20 @@ async fn main() {
     let app_state = pakuvaraus::state::app_state::AppState::new().await;
     let app = pakuvaraus::app(app_state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let bind_addr = std::env::var("BIND_ADDR").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let bind_port = std::env::var("PORT").unwrap_or_else(|_| "3000".to_string());
 
-    let listener = match TcpListener::bind(addr).await {
+    let socket_addr: SocketAddr = format!("{bind_addr}:{bind_port}")
+        .parse()
+        .expect("BIND_ADDR env var must be an IP address");
+
+    let listener = match TcpListener::bind(socket_addr).await {
         Ok(listener) => {
-            println!("Listen on {addr}");
+            println!("Listen on {socket_addr}");
             listener
         }
         Err(e) => {
-            eprintln!("Listener bind failed on address {addr}: {e}");
+            eprintln!("Listener bind failed on address {socket_addr}: {e}");
             return;
         }
     };
