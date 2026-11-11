@@ -1,6 +1,7 @@
 use super::ParseError;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
+use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(try_from = "RawTimeRange")]
@@ -9,8 +10,9 @@ pub struct TimeRange {
     end: DateTime<Utc>,
 }
 
-#[derive(Deserialize)]
-struct RawTimeRange {
+/// `start_time` must be before `end_time`.
+#[derive(Deserialize, ToSchema)]
+pub struct RawTimeRange {
     start_time: DateTime<Utc>,
     end_time: DateTime<Utc>,
 }

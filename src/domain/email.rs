@@ -2,6 +2,7 @@ use std::str::FromStr;
 
 use super::ParseError;
 use serde::Deserialize;
+use utoipa::openapi::{KnownFormat, ObjectBuilder, RefOr, Schema, SchemaFormat, Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, sqlx::Type)]
 #[sqlx(transparent)]
@@ -13,6 +14,16 @@ impl Email {
         &self.0
     }
 }
+
+impl utoipa::PartialSchema for Email {
+    fn schema() -> RefOr<Schema> {
+        ObjectBuilder::new()
+            .schema_type(Type::String)
+            .format(Some(SchemaFormat::KnownFormat(KnownFormat::Email)))
+            .into()
+    }
+}
+impl utoipa::ToSchema for Email {}
 
 impl FromStr for Email {
     type Err = ParseError;

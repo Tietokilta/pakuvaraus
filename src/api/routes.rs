@@ -1,17 +1,24 @@
-use super::get_reservations::get_reservations;
-use super::make_reservation::{cancel_reservation, make_reservation};
+use super::{get_reservations, make_reservation};
 use crate::state::app_state::AppState;
-use axum::{
-    Router,
-    routing::{get, post},
-};
+use utoipa::OpenApi;
+use utoipa_axum::{router::OpenApiRouter, routes};
 
-pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/reservations", post(make_reservation))
-        .route(
-            "/reservations/cancel/{raw_edit_key}",
-            post(cancel_reservation),
-        )
-        .route("/reservations", get(get_reservations))
+#[derive(OpenApi)]
+#[openapi(info(
+    title = "pakuvaraus",
+    description = "Public API for requesting and cancelling van reservations."
+))]
+struct ApiDoc;
+
+/// Public API routes together with their `OpenAPI` description.
+pub fn router() -> OpenApiRouter<AppState> {
+    let mut doc = ApiDoc::openapi();
+    // Cargo.toml declares no license, which would otherwise show up as an empty one
+    doc.info.license = None;
+    OpenApiRouter::with_openapi(doc)
+        .routes(routes!(
+            make_reservation::make_reservation,
+            get_reservations::get_reservations
+        ))
+        .routes(routes!(make_reservation::cancel_reservation))
 }

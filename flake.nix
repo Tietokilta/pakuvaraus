@@ -61,6 +61,23 @@
           };
         };
         cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+
+        # TypeScript client generated from the API's OpenAPI spec, see client/README.md
+        inherit (pkgs) nodejs;
+        pnpm = pkgs.pnpm_11;
+        clientPnpmDeps = pkgs.fetchPnpmDeps {
+          pname = "pakuvaraus-client";
+          src = lib.fileset.toSource {
+            root = ./client;
+            fileset = lib.fileset.unions [
+              ./client/package.json
+              ./client/pnpm-lock.yaml
+            ];
+          };
+          inherit pnpm;
+          fetcherVersion = 4;
+          hash = "sha256-Ex6bVxt+bBUM0keBo6UYlXluguQS55kwL9LpUC6kzo8=";
+        };
       in
       {
         packages = {
@@ -102,11 +119,43 @@
             };
           };
 
+          # OpenAPI description of the public API, generated from the handlers
+          openapi-spec = pkgs.runCommand "openapi.json" { } ''
+            ${self.packages.${system}.pakuvaraus}/bin/pakuvaraus-openapi > $out
+          '';
+
+          # The publishable npm package: types generated from openapi-spec,
+          # typechecked, and packed with the files listed in package.json
+          api-client = pkgs.stdenvNoCC.mkDerivation {
+            pname = "pakuvaraus-client";
+            inherit ((lib.importJSON ./client/package.json)) version;
+            src = lib.fileset.toSource {
+              root = ./client;
+              fileset = lib.fileset.difference ./client (lib.fileset.maybeMissing ./client/node_modules);
+            };
+            pnpmDeps = clientPnpmDeps;
+            nativeBuildInputs = [
+              nodejs
+              pnpm
+              pkgs.pnpmConfigHook
+            ];
+            buildPhase = ''
+              cp ${self.packages.${system}.openapi-spec} openapi.json
+              pnpm run generate
+              pnpm run typecheck
+            '';
+            installPhase = ''
+              export HOME=$TMPDIR
+              mkdir -p $out
+              tar xzf "$(npm pack --silent)" --strip-components=1 -C $out
+            '';
+          };
+
           default = self.packages.${system}.pakuvaraus;
         };
         checks = {
           inherit (self.packages.${system}) pakuvaraus;
-
+          inherit (self.packages.${system}) api-client;
           formatting = pkgs.runCommand "cargo-fmt-check" {
             nativeBuildInputs = [ craneLib.cargo ];
           } ''
@@ -121,6 +170,10 @@
           };
 
           inherit (commonArgs) env;
+          packages = [
+            nodejs
+            pnpm
+          ];
         };
       }
     );

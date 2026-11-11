@@ -47,6 +47,8 @@ Default username: `test-user`, default password: `pass123`
 
 ## API
 
+The public API's OpenAPI spec is generated from the handlers. The server serves it at `/openapi.json`, and `nix build .#openapi-spec` builds it. A typed TypeScript client generated from it is in [client/](./client/README.md).
+
 Example using powershell
 
 ```powershell

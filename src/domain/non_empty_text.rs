@@ -1,5 +1,6 @@
 use super::ParseError;
 use serde::{Deserialize, Serialize};
+use utoipa::openapi::{ObjectBuilder, RefOr, Schema, Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
 #[serde(try_from = "String")]
@@ -17,6 +18,16 @@ impl<const N: usize> NonEmptyText<N> {
 
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+}
+
+impl<const N: usize> utoipa::PartialSchema for NonEmptyText<N> {
+    fn schema() -> RefOr<Schema> {
+        ObjectBuilder::new()
+            .schema_type(Type::String)
+            .min_length(Some(1))
+            .max_length(Some(N))
+            .into()
     }
 }
 

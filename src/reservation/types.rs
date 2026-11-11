@@ -3,8 +3,10 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+use utoipa::ToSchema;
+
 use crate::{
-    domain::{Address, Email, FullName, Hetu, Phone, TimeRange},
+    domain::{Address, Email, FullName, Hetu, Phone, RawTimeRange, TimeRange},
     email::email_templates::ReservationEmail,
 };
 use std::ops::Deref;
@@ -45,7 +47,7 @@ impl Deref for SortedReservations {
 
 //Request
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, ToSchema)]
 pub struct CreateReservation {
     pub full_name: FullName,
     pub address: Address,
@@ -54,7 +56,9 @@ pub struct CreateReservation {
     pub hetu: Hetu,
     // `start_time` and `end_time` in the JSON
     #[serde(flatten)]
+    #[schema(value_type = RawTimeRange, inline)]
     pub time: TimeRange,
+    /// Reserved for guild use rather than a member's personal use
     pub internal: bool,
     pub used_outside_finland: bool,
 }
@@ -71,7 +75,7 @@ impl<'a> From<&'a CreateReservation> for ReservationEmail<'a> {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ReservationItem {
     pub start_time: DateTime<Utc>,
     pub end_time: DateTime<Utc>,

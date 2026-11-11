@@ -2,6 +2,7 @@ use super::ParseError;
 use phonenumber::{Mode, PhoneNumber};
 use serde::Deserialize;
 use std::fmt;
+use utoipa::openapi::{ObjectBuilder, RefOr, Schema, Type};
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(try_from = "String")]
@@ -17,6 +18,18 @@ impl Phone {
         Ok(Self(n))
     }
 }
+
+impl utoipa::PartialSchema for Phone {
+    fn schema() -> RefOr<Schema> {
+        ObjectBuilder::new()
+            .schema_type(Type::String)
+            .description(Some(
+                "Phone number; a number without a country code is read as Finnish",
+            ))
+            .into()
+    }
+}
+impl utoipa::ToSchema for Phone {}
 
 impl TryFrom<String> for Phone {
     type Error = ParseError;
