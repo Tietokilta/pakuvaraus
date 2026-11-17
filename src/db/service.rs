@@ -19,4 +19,11 @@ impl DbService {
     pub async fn create() -> Self {
         Self::from_config(&DbConfig::from_env()).await
     }
+
+    pub async fn migrate(&self) {
+        sqlx::migrate!("./migrations")
+            .run(&self.pool)
+            .await
+            .expect("DB migration failed");
+    }
 }
