@@ -45,12 +45,13 @@ pub struct Server {
 
 impl Server {
     pub async fn from_config(config: &ServerConfig) -> Result<Self, ServerError> {
-        let listener = TcpListener::bind(config.addr)
-            .await
-            .map_err(|source| ServerError::Bind {
-                addr: config.addr,
-                source,
-            })?;
+        let listener =
+            TcpListener::bind(config.addr)
+                .await
+                .map_err(|source| ServerError::Bind {
+                    addr: config.addr,
+                    source,
+                })?;
         println!("Listening on {}", config.addr);
 
         Ok(Self { listener })

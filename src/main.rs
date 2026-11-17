@@ -3,7 +3,13 @@ use pakuvaraus::auth::password::get_password_hash;
 use pakuvaraus::logging;
 use tracing::info;
 
-use pakuvaraus::{auth::types::PlainPassword, state::{app_state::AppState, server::{Server, ServerConfig}}};
+use pakuvaraus::{
+    auth::types::PlainPassword,
+    state::{
+        app_state::AppState,
+        server::{Server, ServerConfig},
+    },
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
