@@ -70,6 +70,7 @@
               nativeBuildInputs = with pkgs; [
                 sqlx-cli
                 postgresql
+                makeBinaryWrapper
               ];
 
               # Set up a temporary PostgreSQL database for sqlx
@@ -83,6 +84,12 @@
                 createdb -U postgres pakuvaraus
                 export DATABASE_URL="postgres://postgres@localhost/pakuvaraus?host=$PGDATA"
                 cargo sqlx migrate run
+              '';
+
+              postFixup = ''
+                cp -r $src/{migrations,static,templates} $out/
+                wrapProgram $out/bin/pakuvaraus \
+                  --chdir $out
               '';
             }
           );
